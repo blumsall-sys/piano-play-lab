@@ -1,5 +1,5 @@
-import {buildMelodyTimeline} from './melody.js?v=1.8.1';
-import {midiToFrequency} from './music.js?v=1.8.1';
+import {buildMelodyTimeline} from './melody.js?v=2.2';
+import {midiToFrequency} from './music.js?v=2.2';
 let ctx;
 async function ensureContext(){
   ctx ??= new (window.AudioContext||window.webkitAudioContext)();
@@ -55,17 +55,15 @@ export async function soundMelody(notes, melodyBeats, bpm, {onNote=()=>{}, onEnd
   const timers=[];
   let stopped=false;
   for(const event of timeline.events){
-    const fundamental=midiToFrequency(event.midi);
     const duration=Math.max(.10,event.duration*.86);
-    [1,2,3].forEach((harmonic,i)=>{
-      oscillators.push(playTone(fundamental*harmonic,{
-        when:zero+event.start,
-        duration,
-        volume:[.09,.018,.006][i],
-        attack:.012,
-        release:.06
-      }));
-    });
+    for(const note of event.notes){
+      const fundamental=midiToFrequency(note);
+      [1,2,3].forEach((harmonic,i)=>{
+        oscillators.push(playTone(fundamental*harmonic,{
+          when:zero+event.start,duration,volume:[.09,.018,.006][i]/Math.sqrt(event.notes.length),attack:.012,release:.06
+        }));
+      });
+    }
     timers.push(setTimeout(()=>{if(!stopped)onNote(event.midi);},Math.round(event.start*1000)));
   }
   const cleanup=()=>{for(const timer of timers)clearTimeout(timer);};
@@ -94,3 +92,34 @@ export async function soundMelody(notes, melodyBeats, bpm, {onNote=()=>{}, onEnd
     }
   };
 }
+
+// Built-in mini-piano synthesizer for soundless USB MIDI controllers.
+export async function prepareMidiAudio(){await ensureContext();}
+const midiVoices=new Map();
+export async function midiSoundOn(note,velocity=96){
+  await ensureContext();
+  midiSoundOff(note);
+  const now=ctx.currentTime;
+  const voices=[];
+  const loud=Math.max(.005,Math.min(.13,(velocity/127)*.13));
+  for(const [harmonic,amount] of [[1,1],[2,.18],[3,.045]]){
+    const osc=ctx.createOscillator(),gain=ctx.createGain();
+    osc.type='sine';osc.frequency.value=midiToFrequency(note)*harmonic;
+    gain.gain.setValueAtTime(.0001,now);
+    gain.gain.exponentialRampToValueAtTime(Math.max(.0001,loud*amount),now+.012);
+    gain.gain.setTargetAtTime(Math.max(.0001,loud*amount*.42),now+.14,.22);
+    osc.connect(gain).connect(ctx.destination);osc.start(now);
+    voices.push({osc,gain});
+  }
+  midiVoices.set(note,voices);
+}
+export function midiSoundOff(note){
+  const voices=midiVoices.get(note);
+  if(!voices||!ctx)return;
+  midiVoices.delete(note);
+  const now=ctx.currentTime;
+  for(const {osc,gain} of voices){
+    try{gain.gain.cancelScheduledValues(now);gain.gain.setTargetAtTime(.0001,now,.045);osc.stop(now+.24);}catch{}
+  }
+}
+export function midiSoundAllOff(){for(const note of [...midiVoices.keys()])midiSoundOff(note);}

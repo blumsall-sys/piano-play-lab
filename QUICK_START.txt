@@ -1,19 +1,8 @@
-PIANO PLAY LAB v1.8.1 - 9 LESSONS + MELODY PREVIEWS
+Cleo's Piano Play Lab v2.4 — Dual keyboard release
 
-IMPORTANT: Close your OLD START_WINDOWS.bat server window FIRST.
+Run START_WINDOWS.bat, then open http://localhost:8000/?build=240
+Default: Hape toy piano, 25 keys F3–F5. Tap the red Start listening button.
+M-Audio: Settings > Choose your piano > M-Audio 32 keys > Connect USB MIDI > Identify leftmost C.
+All 20 lessons, Rhythm Highway and voice guide remain.
 
-1. Extract the ZIP to a new folder, not on top of an old project.
-2. Open PianoPlay_Phase2A_v1.8.1 and run START_WINDOWS.bat.
-3. Open http://localhost:8000/?build=181 (not file://).
-4. Below the lesson selector, look for:
-   v1.8.1 READY · 9 lessons loaded · 5 timed melodies
-5. There are nine lessons; #5 is Twinkle Twinkle Little Star.
-6. Hear whole melody is displayed for every lesson.
-7. Select a melody, hear it, then play one note at a time.
-
-ANDROID / GITHUB PAGES:
-Upload the CONTENTS of the project folder to the ROOT of your GitHub Pages repo.
-Commit changes. Open https://YOURNAME.github.io/YOURREPO/?build=181
-If it still says 1.8 rather than 1.8.1, the site has old files or a cache.
-
-See RELEASE_FIX_v1.8.1.md for details.
+See M_AUDIO_SETUP_v2.4.md and DEPLOY_GITHUB_PAGES_v2.4.md for details.

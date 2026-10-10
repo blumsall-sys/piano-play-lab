@@ -40,7 +40,7 @@ test('YIN rejects silence',()=>{
 });
 test('Lesson notes remain within F3 through F5',()=>{
   const engine=new LessonEngine(lessons);
-  for(const lesson of engine.lessons)for(const note of lesson.notes)assert.ok(note>=53&&note<=77);
+  for(const lesson of engine.lessons)for(const event of lesson.notes)for(const note of Array.isArray(event)?event:[event])assert.ok(note>=53&&note<=77);
 });
 test('Lesson first note is F3, tracks mistakes, and progresses',()=>{
   const engine=new LessonEngine(lessons);

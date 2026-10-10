@@ -1,7 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title Piano Play Lab - Local Server
+title Cleo's Piano Play Lab - Local Server
 where powershell.exe >nul 2>&1
 if errorlevel 1 (
   echo Windows PowerShell was not found.

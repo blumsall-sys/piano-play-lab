@@ -1,4 +1,5 @@
-import {range,midiToName,isBlackKey} from './music.js?v=1.8.1';
+import {range,midiToName,isBlackKey} from './music.js?v=2.4';
+import {profileFor} from './keyboard-profiles.js';
 const NS='http://www.w3.org/2000/svg';
 function el(tag, attrs={}, text){
   const node=document.createElementNS(NS,tag);
@@ -11,22 +12,23 @@ export class Keyboard {
     this.svg=svg;
     this.onPlayed=onPlayed;
     this.nodes=new Map();
-    this.target=null;
-    this.detected=null;
-    this.labelMode='all';
+    this.target=[];
+    this.detected=[];
+    this.labelMode='all';this.collected=[];
+    this.profile=profileFor('hape');
     this.build();
   }
   build(){
     this.svg.replaceChildren();
     this.nodes.clear();
-    const keys=range();
+    const keys=range(this.profile.first,this.profile.last);
     const white=keys.filter(m=>!isBlackKey(m));
-    // Photo-matched 15 white + 10 black; 3+2+3+2 black grouping.
-    const keyW=51, keyY=11, whiteHeight=202, blackW=31, blackHeight=119, margin=10;
+    // Correct chromatic pattern for each physical keyboard (Hape: F to F; M-Audio: C to G).
+    const keyW=this.profile.id==='maudio'?41:51, keyY=11, whiteHeight=202, blackW=this.profile.id==='maudio'?26:31, blackHeight=119, margin=10;
     const width=margin*2+white.length*keyW;
     const height=keyY+whiteHeight+12;
     this.svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
-    this.svg.setAttribute('aria-label',`25 playable piano keys from F3 to F5`);
+    this.svg.setAttribute('aria-label',`${this.profile.count} playable keys from ${midiToName(this.profile.first)} to ${midiToName(this.profile.last)}`);
     const whites=el('g',{class:'white-keys'});
     const blacks=el('g',{class:'black-keys'});
     const labels=el('g',{class:'key-labels'});
@@ -42,14 +44,14 @@ export class Keyboard {
       // Tap triggers a note; dragging scrolls the piano on narrow devices.
       group.addEventListener('pointerdown',e=>{
         if(e.pointerType==='mouse'&&e.button!==0)return;
-        pointer={id:e.pointerId,x:e.clientX,y:e.clientY};
+        pointer={id:e.pointerId,x:e.clientX,y:e.clientY,at:performance.now()};
       });
       group.addEventListener('pointercancel',()=>{pointer=null;});
       group.addEventListener('pointerup',e=>{
         if(!pointer||pointer.id!==e.pointerId)return;
-        const moved=Math.hypot(pointer.x-e.clientX,pointer.y-e.clientY);
+        const held=pointer;const moved=Math.hypot(held.x-e.clientX,held.y-e.clientY);
         pointer=null;
-        if(moved<=12){e.preventDefault();this.onPlayed(midi);}
+        if(moved<=12){e.preventDefault();this.onPlayed(midi,{onsetMs:held.at,holdMs:Math.max(0,performance.now()-held.at)});}
       });
       group.addEventListener('keydown',e=>{
         if(e.key==='Enter'||e.key===' '){e.preventDefault();this.onPlayed(midi);}
@@ -77,16 +79,18 @@ export class Keyboard {
   }
   render(){
     for(const [midi,{rect,label,noteName}] of this.nodes){
-      rect.classList.toggle('target',midi===this.target);
-      rect.classList.toggle('detected',midi===this.detected);
-      label.style.display=this.labelMode==='none'||(this.labelMode==='f'&&!noteName.startsWith('F'))?'none':'';
+      rect.classList.toggle('target',this.target.includes(midi));
+      rect.classList.toggle('detected',this.detected.includes(midi));
+      rect.classList.toggle('collected',this.collected.includes(midi));
+      label.style.display=this.labelMode==='none'||(this.labelMode==='f'&&!noteName.startsWith(this.profile.anchor))?'none':'';
     }
   }
   setTarget(midi){
-    const changed=this.target!==midi;
-    this.target=midi;
+    const notes=midi===null?[]:Array.isArray(midi)?midi:[midi];
+    const changed=String(this.target)!==String(notes);
+    this.target=notes;
     this.render();
-    if(changed&&midi!==null)requestAnimationFrame(()=>this.revealTarget(midi));
+    if(changed&&notes.length)requestAnimationFrame(()=>this.revealTarget(notes[0]));
   }
   revealTarget(midi){
     const area=this.svg.parentElement;
@@ -96,7 +100,11 @@ export class Keyboard {
     const centre=(Number(key.getAttribute('x'))+Number(key.getAttribute('width'))/2)*factor;
     area.scrollTo({left:Math.max(0,centre-area.clientWidth/2),behavior:'smooth'});
   }
-  setDetected(midi){this.detected=midi;this.render();}
+  setProfile(profile){
+    this.profile=profile;this.build();
+  }
+  setCollected(notes){this.collected=[...notes];this.render();}
+  setDetected(midi){this.detected=midi===null?[]:Array.isArray(midi)?midi:[midi];this.render();}
   setLabels(mode){this.labelMode=mode;this.render();}
   pulse(midi){
     const key=this.nodes.get(midi);

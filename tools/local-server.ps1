@@ -12,7 +12,7 @@ $mime = @{
 }
 try {
   $listener.Start()
-  Write-Host 'Piano Play Lab is running at http://localhost:8000/' -ForegroundColor Green
+  Write-Host 'Cleo''s Piano Play Lab is running at http://localhost:8000/' -ForegroundColor Green
   Write-Host 'Keep this window open while testing. Press Ctrl+C to stop.'
   Start-Process 'http://localhost:8000/'
   while ($true) {

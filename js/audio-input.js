@@ -1,6 +1,7 @@
-import {pitchYin,rmsOf} from './pitch.js?v=1.8.1';
-import {frequencyToMidi,MIN_MIDI,MAX_MIDI} from './music.js?v=1.8.1';
-import {applyCorrection,centsBetween,median} from './calibration.js?v=1.8.1';
+import {pitchYin,rmsOf} from './pitch.js?v=2.2';
+import {spectralNotes,ChordFrameStabilizer} from './chord-audio.js?v=2.2';
+import {frequencyToMidi,MIN_MIDI,MAX_MIDI} from './music.js?v=2.2';
+import {applyCorrection,centsBetween,median} from './calibration.js?v=2.2';
 
 // Audio-fix 1.2: analyse the ORIGINAL sample stream (no lossy 4x averaging),
 // apply stable-frame median filtering, and expose raw + corrected pitches.
@@ -24,6 +25,7 @@ export class MicrophoneDetector {
     this.threshold=.0025;this.deviceId='';this.correctionCents=0;
     this.lastCandidate=null;this.hits=0;this.latched=null;this.quietFrames=0;
     this.track=null;this.trackLabel='';this.lastError='';this.history=[];
+    this.chordRecognition=false;this.onChord=()=>{};this.chordStability=new ChordFrameStabilizer(3);this.chordTick=0;
   }
   static async devices(){
     if(!navigator.mediaDevices?.enumerateDevices)return [];
@@ -33,7 +35,7 @@ export class MicrophoneDetector {
   setCorrection(cents){
     if(!Number.isFinite(cents)||Math.abs(cents)>125)throw new RangeError('Unsafe pitch correction');
     this.correctionCents=cents;
-    this.history=[];this.lastCandidate=null;this.hits=0;this.latched=null;
+    this.history=[];this.lastCandidate=null;this.hits=0;this.latched=null;this.chordStability.reset();
   }
   async start(deviceId=''){
     if(this.running)return;
@@ -65,7 +67,7 @@ export class MicrophoneDetector {
       this.context=context;this.mic=stream;this.track=stream.getAudioTracks()[0];
       this.trackLabel=this.track?.label||'Microphone';this.source=source;this.silentSink=silentSink;this.analyser=analyser;
       this.samples=new Float32Array(analyser.fftSize);
-      this.history=[];this.lastCandidate=null;this.hits=0;this.latched=null;this.quietFrames=0;
+      this.history=[];this.lastCandidate=null;this.hits=0;this.latched=null;this.quietFrames=0;this.chordStability.reset();
       this.track.addEventListener('ended',()=>{this.onError(new Error('Microphone stopped or disconnected.'));void this.stop();},{once:true});
       this.running=true;this.tick();this.timer=setInterval(()=>this.tick(),100);
       if(context.state!=='running')this.onError(new Error('Audio context is not running ('+context.state+').'));
@@ -121,7 +123,14 @@ export class MicrophoneDetector {
           }else{reason=adjustedMidi<MIN_MIDI||adjustedMidi>MAX_MIDI?'out-of-range':'uncertain';this.history=[];}
         }else{reason='unclear-pitch';this.history=[];}
       }else{this.history=[];}
-      this.onFrame({rms,peak,db:dbFromRms(rms),midi,rawMidi,frequency:correctedFrequency,
+      let chordCandidates=[];
+      if(this.chordRecognition&&++this.chordTick%2===0&&rms>=this.threshold){
+        chordCandidates=spectralNotes(this.samples,this.context.sampleRate,{correctionCents:-this.correctionCents});
+        const stable=this.chordStability.accept(chordCandidates);
+        if(stable?.length>=2)this.onChord(stable);
+      }
+      if(rms<this.threshold)this.chordStability.accept([]);
+      this.onFrame({rms,peak,db:dbFromRms(rms),chordCandidates,midi,rawMidi,frequency:correctedFrequency,
         rawFrequency,clarity,reason,cents,correctionCents:this.correctionCents,
         threshold:this.threshold,contextState:this.context?.state||'closed',trackState:this.track?.readyState||'unknown',
         trackLabel:this.trackLabel,sampleRate:this.context?.sampleRate});

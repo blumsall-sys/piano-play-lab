@@ -11,7 +11,7 @@
       53,
       53
     ],
-    "spokenInstructions": "Welcome to Piano Play Lab! Let's find F three. It's the white key on the far left of your little piano. Watch it glow yellow. Press that key five times, lifting your finger between each press. Listen for a happy chime when you get it right!"
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play the leftmost f3 key five times, releasing it between notes. Let's find F three. It's the white key on the far left of your little piano. Watch it glow yellow. Press that key five times, lifting your finger between each press. Listen for a happy chime when you get it right!"
   },
   {
     "id": "five-fingers",
@@ -29,7 +29,7 @@
       55,
       53
     ],
-    "spokenInstructions": "Time for a five-finger walk! We will play F three, G three, A three, B flat three, and C four. Then we'll walk back down. Watch the glowing key and play just one note at a time. The B flat key is black. You can go as slowly as you like!"
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to walk from f3 to c4 and back, one note at a time. Time for a five-finger walk! We will play F three, G three, A three, B flat three, and C four. Then we'll walk back down. Watch the glowing key and play just one note at a time. The B flat key is black. You can go as slowly as you like!"
   },
   {
     "id": "little-melody",
@@ -52,7 +52,7 @@
       55,
       53
     ],
-    "spokenInstructions": "Let's play a little melody! Follow the yellow key as it changes. Sometimes we play the same note twice. When that happens, lift your finger and play it again. Listen to the next note if you need help. Ready? Let's make music!"
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to try a short tune using keys in the first octave of your toy piano. play a little melody! Follow the yellow key as it changes. Sometimes we play the same note twice. When that happens, lift your finger and play it again. Listen to the next note if you need help. Ready? Let's make music!"
   },
   {
     "id": "high-low",
@@ -66,7 +66,7 @@
       65,
       53
     ],
-    "spokenInstructions": "Let's explore high and low sounds! Begin with F three, the white key at the far left. Then find F four, one octave higher, and F five, at the far right. Play F four again, and finish on F three. Can you hear the difference?"
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to hear and play f in three different registers on your toy piano. explore high and low sounds! Begin with F three, the white key at the far left. Then find F four, one octave higher, and F five, at the far right. Play F four again, and finish on F three. Can you hear the difference?"
   },
   {
     "id": "twinkle-twinkle",
@@ -121,7 +121,7 @@
       1,
       2
     ],
-    "spokenInstructions": "Let's play Twinkle Twinkle Little Star! Start with the F key near the middle of your piano. Play each glowing note one at a time. First, tap Hear whole melody so you know how the tune sounds. Then follow the golden keys. Some notes repeat, so lift your finger between them. Take your time!"
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play twinkle twinkle and the beginning of its next phrase. a gentle beginner excerpt in f major. play Twinkle Twinkle Little Star! Start with the F key near the middle of your piano. Play each glowing note one at a time. First, tap Hear whole melody so you know how the tune sounds. Then follow the golden keys. Some notes repeat, so lift your finger between them. Take your time!"
   },
   {
     "id": "wheels-on-bus",
@@ -166,7 +166,7 @@
       1,
       2
     ],
-    "spokenInstructions": "Let's go for a musical bus ride! This lesson uses a traditional tune often sung with The Wheels on the Bus. Listen to the whole melody first, then find C five and play along with the glowing keys. Keep the short repeated notes light and bouncy. You can go at your own speed!"
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play an easy instrumental passage using the old mulberry bush melody commonly sung with wheels on the bus. go for a musical bus ride! This lesson uses a traditional tune often sung with The Wheels on the Bus. Listen to the whole melody first, then find C five and play along with the glowing keys. Keep the short repeated notes light and bouncy. You can go at your own speed!"
   },
   {
     "id": "puppy-rescue",
@@ -213,7 +213,7 @@
       1,
       2
     ],
-    "spokenInstructions": "Calling all rescue puppies! Let's play a brand new puppy rescue melody. It has a bouncy, brave sound, and it is our own tune, not the Paw Patrol television theme. Hear the full melody, then follow the golden keys. Can you make it to the end of the rescue mission?"
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to an original adventure melody for rescue-pup fans. this is not the television show's theme music. Calling all rescue puppies! Let's play a brand new puppy rescue melody. It has a bouncy, brave sound, and it is our own tune, not the Paw Patrol television theme. Hear the full melody, then follow the golden keys. Can you make it to the end of the rescue mission?"
   },
   {
     "id": "ice-cream-truck",
@@ -254,7 +254,7 @@
       0.5,
       2
     ],
-    "spokenInstructions": "Do you hear the ice cream truck? This lesson plays a short, simplified bit of The Entertainer, an old ragtime tune that ice cream trucks sometimes play. It starts on G four. Listen to the whole melody, then follow the notes on your piano. This one has a bouncy rhythm!"
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to a short, beginner-friendly excerpt inspired by scott joplin's public-domain ragtime tune, the entertainer. Do you hear the ice cream truck? This lesson plays a short, simplified bit of The Entertainer, an old ragtime tune that ice cream trucks sometimes play. It starts on G four. Listen to the whole melody, then follow the notes on your piano. This one has a bouncy rhythm!"
   },
   {
     "id": "mary-lamb",
@@ -299,6 +299,363 @@
       1,
       2
     ],
-    "spokenInstructions": "Let's play Mary Had a Little Lamb! Start on A four. Walk down one key to G four, then down to F four, and come back up. Listen to the melody first, then follow the golden key as each note appears. Excellent!"
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to a short, traditional beginner melody. practice stepping down and up between neighbouring keys. play Mary Had a Little Lamb! Start on A four. Walk down one key to G four, then down to F four, and come back up. Listen to the melody first, then follow the golden key as each note appears. Excellent!"
+  },
+  {
+    "id": "two-friends",
+    "title": "Two Notes Together",
+    "description": "Find a simple fifth: F3 and C4. Build both notes to complete each chord.",
+    "hint": "Play F3 and C4 together; both keys glow gold.",
+    "category": "chords",
+    "bpm": 80,
+    "notes": [
+      [
+        53,
+        60
+      ],
+      [
+        53,
+        60
+      ],
+      [
+        53,
+        60
+      ]
+    ],
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to find a simple fifth: f3 and c4. build both notes to complete each chord. A chord can have two or more notes. First let us try an F and C together. Touch both golden keys. With a microphone, you can play the notes one at a time in build mode. With MIDI, try pressing them together."
+  },
+  {
+    "id": "thirds",
+    "title": "Happy and Moody Thirds",
+    "description": "Hear a major third and a minor third. Notice the one-key difference.",
+    "hint": "First F3 and A3, then F3 and A-flat 3.",
+    "category": "chords",
+    "bpm": 80,
+    "notes": [
+      [
+        53,
+        57
+      ],
+      [
+        53,
+        57
+      ],
+      [
+        53,
+        56
+      ],
+      [
+        53,
+        56
+      ]
+    ],
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to hear a major third and a minor third. notice the one-key difference. Our two-note friends can sound happy or moody. Play F with A, then F with A flat. Watch how changing one key changes the sound."
+  },
+  {
+    "id": "f-major",
+    "title": "Build an F Major Chord",
+    "description": "Play F3, A3 and C4: three keys making one major chord.",
+    "hint": "Find F3, A3 and C4. All three keys turn gold.",
+    "category": "chords",
+    "bpm": 80,
+    "notes": [
+      [
+        53,
+        57,
+        60
+      ],
+      [
+        53,
+        57,
+        60
+      ],
+      [
+        53,
+        57,
+        60
+      ]
+    ],
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play f3, a3 and c4: three keys making one major chord. Let us build an F major chord. Find F three, A three and C four. Listen to the three notes together, then find each golden key. Great job!"
+  },
+  {
+    "id": "c-major",
+    "title": "Build a C Major Chord",
+    "description": "A new happy-sounding chord: C4, E4 and G4.",
+    "hint": "Find C4, E4 and G4, then play the three notes.",
+    "category": "chords",
+    "bpm": 80,
+    "notes": [
+      [
+        60,
+        64,
+        67
+      ],
+      [
+        60,
+        64,
+        67
+      ],
+      [
+        60,
+        64,
+        67
+      ]
+    ],
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to a new happy-sounding chord: c4, e4 and g4. This time, make a C major chord. Put together C four, E four and G four. Take your time, and listen to how it sounds."
+  },
+  {
+    "id": "bb-major",
+    "title": "Build a B-flat Major Chord",
+    "description": "Learn a chord with a black key: B♭3, D4 and F4.",
+    "hint": "Start on the black B♭3, then add D4 and F4.",
+    "category": "chords",
+    "bpm": 80,
+    "notes": [
+      [
+        58,
+        62,
+        65
+      ],
+      [
+        58,
+        62,
+        65
+      ],
+      [
+        58,
+        62,
+        65
+      ]
+    ],
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to learn a chord with a black key: b♭3, d4 and f4. Let us find a B flat chord. B flat is the black key between A and B. Play B flat three, D four, and F four."
+  },
+  {
+    "id": "f-minor",
+    "title": "Major or Minor?",
+    "description": "Compare F major with F minor by lowering A3 to A♭3.",
+    "hint": "First F–A–C, then F–A♭–C.",
+    "category": "chords",
+    "bpm": 80,
+    "notes": [
+      [
+        53,
+        57,
+        60
+      ],
+      [
+        53,
+        56,
+        60
+      ],
+      [
+        53,
+        57,
+        60
+      ],
+      [
+        53,
+        56,
+        60
+      ]
+    ],
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to compare f major with f minor by lowering a3 to a♭3. Major and minor chords can feel different. Play F major with A, then F minor with A flat. Only one key changes!"
+  },
+  {
+    "id": "d-minor",
+    "title": "Build D Minor",
+    "description": "Try D4, F4 and A4, a new three-note chord.",
+    "hint": "Play D4, F4 and A4. They are all white keys.",
+    "category": "chords",
+    "bpm": 80,
+    "notes": [
+      [
+        62,
+        65,
+        69
+      ],
+      [
+        62,
+        65,
+        69
+      ],
+      [
+        62,
+        65,
+        69
+      ]
+    ],
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to try d4, f4 and a4, a new three-note chord. Here is D minor. Find D four, F four, and A four. Listen closely and practice the full chord."
+  },
+  {
+    "id": "two-chord-song",
+    "title": "F to C Chord Changes",
+    "description": "Change between two chords: F major and C major.",
+    "hint": "Play all the gold notes in each chord; watch the change.",
+    "category": "chords",
+    "bpm": 80,
+    "notes": [
+      [
+        53,
+        57,
+        60
+      ],
+      [
+        60,
+        64,
+        67
+      ],
+      [
+        53,
+        57,
+        60
+      ],
+      [
+        60,
+        64,
+        67
+      ]
+    ],
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to change between two chords: f major and c major. Time for a chord change. Start with F major. Then switch to C major. Every time the golden keys change, find the next chord.",
+    "melodyBeats": [
+      2,
+      2,
+      2,
+      2
+    ]
+  },
+  {
+    "id": "three-chord-song",
+    "title": "Three-Chord Parade",
+    "description": "Play the familiar F–B♭–C progression.",
+    "hint": "Find the F chord, then B-flat, then C.",
+    "category": "chords",
+    "bpm": 80,
+    "notes": [
+      [
+        53,
+        57,
+        60
+      ],
+      [
+        58,
+        62,
+        65
+      ],
+      [
+        60,
+        64,
+        67
+      ],
+      [
+        53,
+        57,
+        60
+      ]
+    ],
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play the familiar f–b♭–c progression. Three chords can make a whole song. Play F major, B flat major, C major, then back home to F.",
+    "melodyBeats": [
+      2,
+      2,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "broken-and-together",
+    "title": "Broken Chord, Full Chord",
+    "description": "First play F3, A3 and C4 one at a time; then play them together.",
+    "hint": "Single notes lead to the full three-note chord.",
+    "category": "chords",
+    "bpm": 80,
+    "notes": [
+      53,
+      57,
+      60,
+      [
+        53,
+        57,
+        60
+      ],
+      53,
+      57,
+      60,
+      [
+        53,
+        57,
+        60
+      ]
+    ],
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to first play f3, a3 and c4 one at a time; then play them together. Sometimes we play a chord one note at a time. That is called a broken chord. Now let us try all three together!",
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      2
+    ]
+  },
+  {
+    "id": "first-chord-tune",
+    "title": "My First Chord Song",
+    "description": "Finish with a simple chord song using F, C, B♭, F and D minor.",
+    "hint": "Each chord is one step. Listen to the chord song first.",
+    "category": "chords",
+    "bpm": 80,
+    "notes": [
+      [
+        53,
+        57,
+        60
+      ],
+      [
+        60,
+        64,
+        67
+      ],
+      [
+        58,
+        62,
+        65
+      ],
+      [
+        53,
+        57,
+        60
+      ],
+      [
+        62,
+        65,
+        69
+      ],
+      [
+        58,
+        62,
+        65
+      ],
+      [
+        60,
+        64,
+        67
+      ],
+      [
+        53,
+        57,
+        60
+      ]
+    ],
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to finish with a simple chord song using f, c, b♭, f and d minor. You are ready for your first chord song! Watch three keys glow for every chord. Try them together or build them one at a time. You are making real harmony!",
+    "melodyBeats": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      4
+    ]
   }
 ]

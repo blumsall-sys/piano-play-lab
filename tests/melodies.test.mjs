@@ -7,9 +7,9 @@ import {buildMelodyTimeline} from '../js/melody.js';
 const lessons = JSON.parse(readFileSync(new URL('../lessons/lessons.json',import.meta.url),'utf8'));
 const newIDs=['twinkle-twinkle','wheels-on-bus','puppy-rescue','ice-cream-truck','mary-lamb'];
 test('Five new melody lessons included alongside original four',()=>{
-  assert.equal(validateLessons(lessons).length,9);
-  assert.deepEqual(lessons.slice(4).map(l=>l.id),newIDs);
-  for(const l of lessons.slice(4)){
+  assert.equal(validateLessons(lessons).length,20);
+  assert.deepEqual(lessons.slice(4,9).map(l=>l.id),newIDs);
+  for(const l of lessons.slice(4,9)){
     assert.ok(l.spokenInstructions.length>60);
     assert.equal(l.notes.length,l.melodyBeats.length);
     assert.ok(l.notes.every(n=>n>=MIN_MIDI&&n<=MAX_MIDI));
@@ -17,7 +17,7 @@ test('Five new melody lessons included alongside original four',()=>{
   }
 });
 test('Rhythmic preview builds one event per press and stays in sequence',()=>{
-  for(const l of lessons.slice(4)){
+  for(const l of lessons.slice(4,9)){
     const timeline=buildMelodyTimeline(l.notes,l.melodyBeats,l.bpm);
     assert.equal(timeline.events.length,l.notes.length);
     assert.ok(timeline.totalSeconds>3);
@@ -42,7 +42,7 @@ test('Music previews never alter the score; attempts count only after key events
 });
 test('Completing each melody offers the correct next lesson and metrics',()=>{
   const e=new LessonEngine(lessons);
-  for(let i=4;i<lessons.length;i++){
+  for(let i=4;i<9;i++){
     e.select(lessons[i].id);
     for(const n of e.lesson.notes)assert.equal(e.accept(n).correct,true);
     assert.equal(e.state().done,true);
@@ -52,6 +52,6 @@ test('Completing each melody offers the correct next lesson and metrics',()=>{
   }
 });
 test('Invalid beat arrays and out-of-range notes fail cleanly',()=>{
-  assert.throws(()=>validateLessons([{...lessons[4],melodyBeats:[1,2]}]),/beat/i);
-  assert.throws(()=>validateLessons([{...lessons[4],notes:[78]}]),/out-of-range/i);
+  assert.throws(()=>validateLessons([{...lessons[4],melodyBeats:[1,2]}]),/duration|beat/i);
+  assert.throws(()=>validateLessons([{...lessons[4],notes:[78]}]),/invalid note/i);
 });

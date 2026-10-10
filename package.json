@@ -1,9 +1,9 @@
 {
-  "name": "piano-play-lab-phase-2a",
-  "version": "1.8.1",
+  "name": "cleos-piano-play-lab",
+  "version": "2.4.0",
   "private": true,
   "type": "module",
-  "description": "Stable 9-lesson F3–F5 toy piano trainer, rhythmic preview for every lesson, microphone and narration",
+  "description": "Cleo's Piano Play Lab: 20 lessons, rhythm highway, step checkpoints, microphone and MIDI",
   "scripts": {
     "test": "node --test tests/*.test.mjs"
   }

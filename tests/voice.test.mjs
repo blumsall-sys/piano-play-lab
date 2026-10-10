@@ -16,8 +16,8 @@ function mockSpeech(){
     onState:s=>counts.events.push(s),onBegin:()=>counts.begin++,onFinish:()=>counts.finish++});
   return {guide,synth,counts};
 }
-test('All nine lessons have specific spoken instructions',()=>{
-  assert.equal(lessons.length,9);
+test('All twenty lessons have specific spoken instructions',()=>{
+  assert.equal(lessons.length,20);
   for(const l of lessons){
     assert.ok(l.spokenInstructions && l.spokenInstructions.length>75,`${l.id} has no narration`);
     assert.ok(l.spokenInstructions.includes('!') || l.spokenInstructions.includes('.'));

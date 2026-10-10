@@ -1,0 +1,30 @@
+PIANO PLAY LAB / PHASE 2A AUDIO FIX v1.1
+=========================
+
+LOCAL WINDOWS TEST (NO INSTALL REQUIRED)
+1. CLOSE the old Piano Play Lab server window, then extract this ZIP to a NEW folder.
+2. Open the PianoPlay_Phase2A folder.
+3. Double-click START_WINDOWS.bat.
+4. Your browser opens http://localhost:8000/
+5. First, click the highlighted gold piano key to check the lesson.
+6. Click CHECK NOTE DETECTOR first, to verify the synthetic pitch test passes.
+7. Choose the correct microphone from MICROPHONE INPUT, click Start listening and grant access.
+8. CLAP near the mic; the input meter and dBFS number should respond.
+9. If it stays silent, check Windows System > Sound > Input and browser permissions.
+10. When the meter moves, test a real piano note.
+11. Play single notes C4, D4, E4, etc. Release each key between attempts.
+12. Optional: Turn on camera preview. This only shows video; it does not identify fingers.
+13. Close the server's black/blue console window when finished.
+
+GITHUB PAGES
+1. Create a public repository, such as piano-play-lab.
+2. Upload the CONTENTS of this folder, with index.html at repository root.
+3. GitHub repository: Settings > Pages > Deploy from a branch > main > /(root) > Save.
+4. Open https://YOUR_USERNAME.github.io/piano-play-lab/
+5. Test the keyboard and allow microphone permission in that browser.
+
+Read README.md for troubleshooting and editable lesson notes.
+
+IMPORTANT: one-note pitch recognition only. Chords, sheet music and finger-pose art are future phases. No sound or video is recorded or uploaded.
+
+FOR MICROPHONE TROUBLESHOOTING OPEN AUDIO_FIX_v1.1.md.

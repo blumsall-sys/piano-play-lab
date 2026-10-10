@@ -1,0 +1,8 @@
+{
+  "name": "piano-play-lab-phase-2a",
+  "version": "1.2.0",
+  "private": true,
+  "type": "module",
+  "description": "No-build 25-key HTML5 microphone piano lesson prototype",
+  "scripts": {"test": "node --test tests/core.test.mjs"}
+}

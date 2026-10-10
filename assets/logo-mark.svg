@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Piano Play Lab logo">
+ <defs><linearGradient id="paper" x2="1" y2="1"><stop stop-color="#ffe5a1"/><stop offset="1" stop-color="#ffbd41"/></linearGradient></defs>
+ <rect width="100" height="100" rx="24" fill="url(#paper)"/>
+ <rect x="19" y="28" width="62" height="47" rx="8" fill="#fffdf7" stroke="#3e4651" stroke-width="2.2"/>
+ <path d="M32 74V29M48 74V29M64 74V29" stroke="#7e8791" stroke-width="1.8"/>
+ <path d="M31 29h10v26H31zM53 29h10v26H53z" fill="#293344"/>
+ <path d="M72 23V10M72 10C74 19 87 18 86 27C84 34 76 35 71 31" fill="none" stroke="#245f61" stroke-width="4.5" stroke-linecap="round"/>
+ <circle cx="70" cy="30" r="7.5" fill="#15a595"/>
+ <circle cx="29" cy="83" r="4" fill="#fff1c6"/><path d="m78 79 4-7 4 7 8 2-8 3-4 7-4-7-8-3z" fill="#fff4c3"/>
+</svg>

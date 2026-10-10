@@ -1,6 +1,6 @@
-import {pitchYin,rmsOf} from './pitch.js';
-import {frequencyToMidi,MIN_MIDI,MAX_MIDI} from './music.js';
-import {applyCorrection,centsBetween,median} from './calibration.js';
+import {pitchYin,rmsOf} from './pitch.js?v=1.6';
+import {frequencyToMidi,MIN_MIDI,MAX_MIDI} from './music.js?v=1.6';
+import {applyCorrection,centsBetween,median} from './calibration.js?v=1.6';
 
 // Audio-fix 1.2: analyse the ORIGINAL sample stream (no lossy 4x averaging),
 // apply stable-frame median filtering, and expose raw + corrected pitches.
@@ -8,10 +8,10 @@ const AudioContextCtor = () => window.AudioContext || window.webkitAudioContext;
 export const dbFromRms = rms => rms > 0 ? 20*Math.log10(rms) : -120;
 export const levelPercent = rms => Math.max(0,Math.min(100,(dbFromRms(rms)+75)*100/60));
 export function runPitchSelfTest() {
-  const fs=48000, frequencies=[261.625565,329.627557,391.995436,523.251131,783.990872,1046.502261];
+  const fs=48000, frequencies=[174.614116,220,261.625565,349.228231,523.251131,698.456463];
   const results=frequencies.map(hz=>{
     const samples=Float32Array.from({length:8192},(_,i)=>0.11*(Math.sin(2*Math.PI*hz*i/fs)+0.35*Math.sin(4*Math.PI*hz*i/fs)+.12*Math.sin(6*Math.PI*hz*i/fs)));
-    const result=pitchYin(samples,fs,{minHz:225,maxHz:1150,threshold:.20});
+    const result=pitchYin(samples,fs,{minHz:145,maxHz:850,threshold:.20});
     return {hz:result?.frequency??null,clarity:result?.clarity??0,expected:hz,ok:!!result&&Math.abs(centsBetween(result.frequency,hz))<8};
   });
   return {passed:results.every(x=>x.ok),frequency:results[0].hz,midi:results[0].hz?frequencyToMidi(results[0].hz):null,clarity:results[0].clarity,results};
@@ -99,7 +99,7 @@ export class MicrophoneDetector {
       let peak=0;for(let i=0;i<this.samples.length;i++)peak=Math.max(peak,Math.abs(this.samples[i]));
       let reason='silence',rawFrequency=null,rawMidi=null,correctedFrequency=null,midi=null,clarity=0,cents=NaN;
       if(rms>=this.threshold){
-        const pitch=pitchYin(this.samples,this.context.sampleRate,{minHz:225,maxHz:1150,threshold:.20});
+        const pitch=pitchYin(this.samples,this.context.sampleRate,{minHz:145,maxHz:850,threshold:.20});
         if(pitch){
           rawFrequency=pitch.frequency;clarity=pitch.clarity;
           rawMidi=frequencyToMidi(rawFrequency);

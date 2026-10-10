@@ -6,27 +6,27 @@
   <meta name="theme-color" content="#fff8ed">
   <meta name="description" content="Piano Play Lab: practice beginner piano notes with an interactive toy piano and live microphone detection.">
   <link rel="icon" href="./assets/logo-mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./css/styles.css?v=1.4">
+  <link rel="stylesheet" href="./css/styles.css?v=1.6">
   <title>Piano Play Lab · Phase 2A</title>
 </head>
 <body>
   <div class="app-shell">
     <header class="site-header">
       <div class="brand"><img src="./assets/logo-mark.svg" alt="" width="47" height="47"><div><strong>Piano Play <span>Lab</span></strong><small>Learn a little. Play a lot.</small></div></div>
-      <span class="version-chip">INTERACTIVE DEMO · 2A / ANDROID READY 1.4</span>
+      <span class="version-chip">INTERACTIVE DEMO · 2A / F3–F5 KEYS 1.6</span>
     </header>
 
     <main>
       <section class="welcome">
-        <div class="welcome-copy"><span class="eyebrow"><span class="tiny-star">✦</span> YOUR FIRST PIANO ADVENTURE</span><h1>Every note is <em>a new discovery.</em></h1><p>Listen, find the right key, and play along on your own mini piano. The keyboard now mirrors a compact toy-piano style layout from C4 to C6.</p></div>
+        <div class="welcome-copy"><span class="eyebrow"><span class="tiny-star">✦</span> YOUR FIRST PIANO ADVENTURE</span><h1>Every note is <em>a new discovery.</em></h1><p>Listen, find the right key, and play along on your own mini piano. The 25 keys match the physical toy piano: F3 on the left, F5 on the right.</p></div>
         <img class="welcome-illustration" src="./assets/hero-notes.svg" alt="Colourful illustrated music notes floating above piano keys">
       </section>
 
       <section class="lesson-top panel" aria-labelledby="lesson-title">
-        <div class="lesson-heading"><div><span class="eyebrow">CHOOSE AN ADVENTURE</span><h2 id="lesson-title">Ready to make music?</h2></div><label class="select-wrap">Lesson <select id="lesson-select" aria-label="Choose a lesson"><option value="middle-c">1 · Meet Middle C</option><option value="five-fingers">2 · Five-Finger Walk</option><option value="little-melody">3 · Little Melody</option><option value="high-low">4 · High and Low</option></select></label></div>
-        <p class="lesson-description" id="lesson-description">Learn to find Middle C on your keyboard.</p>
+        <div class="lesson-heading"><div><span class="eyebrow">CHOOSE AN ADVENTURE</span><h2 id="lesson-title">Ready to make music?</h2></div><label class="select-wrap">Lesson <select id="lesson-select" aria-label="Choose a lesson"><option value="middle-c">1 · Find the First F</option><option value="five-fingers">2 · Five-Finger Walk</option><option value="little-melody">3 · Little Melody</option><option value="high-low">4 · High and Low</option></select></label></div>
+        <p class="lesson-description" id="lesson-description">Find the first F key on your keyboard.</p>
         <div class="status-grid">
-          <div class="status-card target-card"><span class="status-label">PLAY THIS NOTE</span><strong id="target-note" aria-live="polite">C4</strong><span id="target-hint" class="subtle">Middle C</span></div>
+          <div class="status-card target-card"><span class="status-label">PLAY THIS NOTE</span><strong id="target-note" aria-live="polite">F3</strong><span id="target-hint" class="subtle">The first F key</span></div>
           <div class="status-card"><span class="status-label">YOUR PIANO PLAYED</span><strong id="heard-note" aria-live="polite">—</strong><span id="heard-details" class="subtle">Turn on the mic to listen</span></div>
           <div class="status-card"><span class="status-label">YOUR PROGRESS</span><strong id="progress-count">0 / 5</strong><span id="stars-text" class="subtle">0% complete</span></div>
         </div>
@@ -36,15 +36,15 @@
 
       <section class="piano-panel panel" aria-labelledby="piano-title">
         <div class="section-heading"><div><span class="eyebrow">THE MUSIC ROOM</span><h2 id="piano-title">Your interactive toy piano</h2></div><div class="legend"><span><i class="legend-dot guide"></i> Find this key</span><span><i class="legend-dot played"></i> Played key</span></div></div>
-        <div class="keyboard-scroll toy-scroll" id="keyboard-scroll" role="region" aria-label="Horizontally scrollable piano keys" tabindex="0"><svg id="keyboard" class="keyboard toy-keyboard" viewBox="0 0 930 364" role="group" aria-label="Playable toy piano keyboard from C4 to C6"></svg></div>
-        <div class="keyboard-footer"><span>← Low C (C4)</span><span>25 interactive keys · swipe sideways on phones</span><span>High C (C6) →</span></div>
+        <div class="keyboard-scroll toy-scroll" id="keyboard-scroll" role="region" aria-label="Horizontally scrollable piano keys" tabindex="0"><svg id="keyboard" class="keyboard toy-keyboard" viewBox="0 0 785 225" role="group" aria-label="Playable toy piano keyboard from F3 to F5"></svg></div>
+        <div class="keyboard-footer"><span>← Low F (F3)</span><span>25 interactive keys · swipe sideways on phones</span><span>High F (F5) →</span></div>
         <p class="touch-tip">☝️ On a phone or tablet, tap a key to play or swipe horizontally to explore all 25 keys. For microphone detection, press Start listening and grant permission.</p>
         <div class="controls-row">
           <button class="btn btn-primary" id="mic-button" type="button"><span id="mic-icon">●</span><span id="mic-button-text">Start listening</span></button>
           <button class="btn btn-secondary" id="resume-audio-button" type="button" hidden>↻ Resume microphone audio</button>
           <button class="btn btn-secondary" id="demo-button" type="button">▶ Hear next note</button>
           <button class="btn btn-secondary" id="reset-button" type="button">↺ Restart lesson</button>
-          <label class="toggle-control" for="label-mode">Key labels <select id="label-mode"><option value="all">All notes</option><option value="c">C only</option><option value="none">Hidden</option></select></label>
+          <label class="toggle-control" for="label-mode">Key labels <select id="label-mode"><option value="all">All notes</option><option value="f">F only</option><option value="none">Hidden</option></select></label>
         </div>
         <section class="mic-tools" aria-label="Microphone setup and troubleshooting">
           <div class="mic-settings">
@@ -72,15 +72,15 @@
         </section>
         <section class="calibration-panel" aria-label="Optional piano reference check">
           <h3>♪ Piano reference check <span class="subtle">(optional)</span></h3>
-          <p>If your toy keyboard seems consistently sharp or flat, check its Transpose setting first if available. For a measured comparison, start the mic and capture a steady Middle C (C4), then G4. Hold each key for about 2 seconds. This does not change the piano's tuning.</p>
+          <p>If your toy keyboard seems consistently sharp or flat, check its Transpose setting first if available. For a measured comparison, start the mic and capture F3 (leftmost key), then C4. Hold each key for about 2 seconds. This does not change the piano's tuning.</p>
           <div class="calibration-actions">
-            <button class="btn btn-secondary btn-small" id="capture-c4" type="button">1 · Capture C4</button>
-            <button class="btn btn-secondary btn-small" id="capture-g4" type="button" disabled>2 · Capture G4</button>
+            <button class="btn btn-secondary btn-small" id="capture-f3" type="button">1 · Capture F3</button>
+            <button class="btn btn-secondary btn-small" id="capture-c4" type="button" disabled>2 · Capture C4</button>
             <button class="btn btn-primary btn-small" id="apply-calibration" type="button" disabled>Apply measured offset</button>
             <button class="btn btn-secondary btn-small" id="reset-calibration" type="button">Clear correction</button>
           </div>
-          <div class="calibration-tags"><span id="c4-reference">C4: not captured</span><span id="g4-reference">G4: not captured</span><span id="current-correction">Correction: OFF</span></div>
-          <div id="calibration-message" class="calibration-message" role="status">Begin by starting the microphone, then play C4 on your toy piano.</div>
+          <div class="calibration-tags"><span id="f3-reference">F3: not captured</span><span id="c4-reference">C4: not captured</span><span id="current-correction">Correction: OFF</span></div>
+          <div id="calibration-message" class="calibration-message" role="status">Begin by starting the microphone, then play F3 on your toy piano.</div>
           <span id="mic-raw-text">Raw frequency and tuning deviation will appear when listening.</span>
         </section>
       </section>
@@ -110,6 +110,6 @@
       <footer><span>Made for curious little musicians ♪</span><span>Phase 2A · Android/tablet compatible · No account required</span></footer>
     </main>
   </div>
-  <script type="module" src="./js/main.js?v=1.4"></script>
+  <script type="module" src="./js/main.js?v=1.6"></script>
 </body>
 </html>

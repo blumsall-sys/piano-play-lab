@@ -1,4 +1,4 @@
-import {midiToFrequency} from './music.js';
+import {midiToFrequency} from './music.js?v=1.6';
 let ctx;
 async function ensureContext(){
   ctx ??= new (window.AudioContext||window.webkitAudioContext)();

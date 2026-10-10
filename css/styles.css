@@ -31,16 +31,6 @@
 /* v1.3 toy piano layout and lesson results */
 .toy-scroll{padding:10px 8px 6px;background:linear-gradient(180deg,#f4f5f4,#fff)}
 .toy-keyboard{min-width:930px;max-width:none;width:930px}
-#keyboard .toy-body{fill:#181a1f;stroke:#0d0e11;stroke-width:2}
-#keyboard .toy-keybed{fill:#f3f0eb;stroke:#15171b;stroke-width:1.5}
-#keyboard .toy-side{fill:#14161b;stroke:#0f1013;stroke-width:1.3}
-#keyboard .toy-brand{fill:#fff;font-size:18px;font-weight:800;letter-spacing:.02em}
-#keyboard .toy-btn{fill:#fbfcfd;stroke:#dce2e7;stroke-width:1}
-#keyboard .toy-btn-label{fill:#f2f2f2;font-size:9px;font-weight:650}
-#keyboard .toy-led{fill:#f54365;filter:drop-shadow(0 0 6px rgba(245,67,101,.55))}
-#keyboard .toy-power{fill:#d0d2d7;font-size:11px;font-weight:700}
-#keyboard .toy-switch{fill:#d9dde0;stroke:#adb3b8;stroke-width:1}
-#keyboard .speaker-dot{fill:#101114;stroke:#2f353c;stroke-width:1.4}
 #keyboard .key.white{fill:#fffdf8;stroke:#8e9196;stroke-width:1.05}
 #keyboard .key.black{fill:#1e2127;stroke:#0e1014;stroke-width:1.1}
 #keyboard .key.white.target{fill:#ffd56b}
@@ -143,3 +133,11 @@ button,.btn,select{min-height:44px}
   .lesson-top,.piano-panel{margin-bottom:8px}
 }
 @media(prefers-reduced-motion:reduce){html,.keyboard-scroll{scroll-behavior:auto}}
+
+/* v1.6 same photo-matched 25-key layout: F3 through F5, no hardware UI */
+#keyboard{width:100%;min-width:775px;max-width:100%;height:auto;margin:auto}
+.toy-scroll{padding:10px;background:#f4f4f1;border:1px solid #e1e2df}
+#keyboard .key-label{font-size:12px}
+#keyboard .key-label.dark{font-size:9px}
+@media(max-width:900px){#keyboard{width:785px;min-width:785px;max-width:none}}
+@media(max-width:600px){#keyboard{width:785px;min-width:785px;max-width:none}}

@@ -1,4 +1,4 @@
-import {midiToFrequency} from './music.js';
+import {midiToFrequency} from './music.js?v=1.6';
 
 export const centsBetween = (measured, reference) =>
   measured > 0 && reference > 0 ? 1200 * Math.log2(measured / reference) : NaN;
@@ -25,11 +25,11 @@ export function evaluateReference(midi, samples) {
     return {ok:false,message:`Pitch is unstable (±${variation.toFixed(0)} cents). Try a longer single note away from other sounds.`};
   return {ok:true,midi,measured:median(candidates),expected,cents:central,variation,count:candidates.length};
 }
-export function compareReferences(c4,g4) {
-  if(!c4?.ok || !g4?.ok) return {ok:false,message:'Capture both reference notes before applying a correction.'};
-  const difference=Math.abs(c4.cents-g4.cents);
-  if(difference>28) return {ok:false,message:`C4 and G4 disagree by ${difference.toFixed(0)} cents. This suggests an inconsistent pitch estimate, not a simple tuning offset. Leave correction OFF and investigate microphone/audio effects.`};
-  const correction=median([c4.cents,g4.cents]);
+export function compareReferences(firstNote,secondNote) {
+  if(!firstNote?.ok || !secondNote?.ok) return {ok:false,message:'Capture both reference notes before applying a correction.'};
+  const difference=Math.abs(firstNote.cents-secondNote.cents);
+  if(difference>28) return {ok:false,message:`F3 and C4 disagree by ${difference.toFixed(0)} cents. This suggests an inconsistent pitch estimate, not a simple tuning offset. Leave correction OFF and investigate microphone/audio effects.`};
+  const correction=median([firstNote.cents,secondNote.cents]);
   if(Math.abs(correction)>125) return {ok:false,message:'Offset is too large to compensate safely. Check piano transpose and tuning settings.'};
   const large=Math.abs(correction)>40;
   return {ok:true,correction,large,message:large

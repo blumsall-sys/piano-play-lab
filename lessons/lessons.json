@@ -1,30 +1,67 @@
 [
   {
-    "id":"middle-c",
-    "title":"Meet Middle C",
-    "description":"Start on the toy piano's first C anchor and play Middle C a few times.",
-    "hint":"Look for the highlighted C4 key near the left side of the toy piano.",
-    "notes":[60,60,60,60,60]
+    "id": "middle-c",
+    "title": "Find the First F",
+    "description": "Play the leftmost F3 key five times, releasing it between notes.",
+    "hint": "The far-left white key is F3. Tap the highlighted first key.",
+    "notes": [
+      53,
+      53,
+      53,
+      53,
+      53
+    ]
   },
   {
-    "id":"five-fingers",
-    "title":"Five-Finger Walk",
-    "description":"Walk up and back down using five notes. Finger guides can be added in Phase 2B.",
-    "hint":"Move step by step from C4 up to G4, then return to C4.",
-    "notes":[60,62,64,65,67,65,64,62,60]
+    "id": "five-fingers",
+    "title": "Five-Finger Walk",
+    "description": "Walk from F3 to C4 and back, one note at a time.",
+    "hint": "Play F3, G3, A3, B♭3, C4, then back to F3.",
+    "notes": [
+      53,
+      55,
+      57,
+      58,
+      60,
+      58,
+      57,
+      55,
+      53
+    ]
   },
   {
-    "id":"little-melody",
-    "title":"A Little Melody",
-    "description":"Can you make a tiny song? Listen, then play each note in order.",
-    "hint":"Take your time. There is no timer or penalty for trying a different note.",
-    "notes":[60,60,67,67,69,69,67,65,65,64,64,62,62,60]
+    "id": "little-melody",
+    "title": "A Little Melody",
+    "description": "Try a short tune using keys in the first octave of your toy piano.",
+    "hint": "Find the highlighted key and play each note in turn.",
+    "notes": [
+      53,
+      53,
+      60,
+      60,
+      62,
+      62,
+      60,
+      58,
+      58,
+      57,
+      57,
+      55,
+      55,
+      53
+    ]
   },
   {
-    "id":"high-low",
-    "title":"High and Low",
-    "description":"Hear the difference between the toy piano's low C, middle C, and high C.",
-    "hint":"C4 is low on this piano, C5 is higher, and C6 is highest.",
-    "notes":[60,72,84,72,60]
+    "id": "high-low",
+    "title": "High and Low F",
+    "description": "Hear and play F in three different registers on your toy piano.",
+    "hint": "Play the leftmost F3, F4 in the middle, and rightmost F5.",
+    "notes": [
+      53,
+      65,
+      77,
+      65,
+      53
+    ]
   }
 ]

@@ -1,9 +1,9 @@
-import {Keyboard} from './keyboard.js';
-import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=1.2';
-import {LessonEngine} from './lesson.js';
-import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js';
-import {soundNote,soundChime,soundCelebration} from './sound.js';
-import {evaluateReference,compareReferences,centsBetween} from './calibration.js';
+import {Keyboard} from './keyboard.js?v=1.6';
+import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=1.6';
+import {LessonEngine} from './lesson.js?v=1.6';
+import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=1.6';
+import {soundNote,soundChime,soundCelebration} from './sound.js?v=1.6';
+import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=1.6';
 
 const $=id=>document.getElementById(id);
 const elements={
@@ -12,8 +12,8 @@ const elements={
   micBtn:$('mic-button'),resumeAudio:$('resume-audio-button'),micText:$('mic-button-text'),micLed:$('mic-led'),micStatus:$('mic-status-text'),soundFill:$('sound-fill'),confidence:$('confidence-text'),
   micDevice:$('mic-device'),micRefresh:$('mic-refresh'),micSensitivity:$('mic-sensitivity'),micSelfTest:$('mic-self-test'),
   micLevel:$('mic-level-text'),micMeter:$('mic-meter'),micDebug:$('mic-debug-text'),
-  rawReadout:$('mic-raw-text'),captureC4:$('capture-c4'),captureG4:$('capture-g4'),applyCal:$('apply-calibration'),resetCal:$('reset-calibration'),
-  calibrationMessage:$('calibration-message'),c4Reference:$('c4-reference'),g4Reference:$('g4-reference'),correctionReadout:$('current-correction'),
+  rawReadout:$('mic-raw-text'),captureF3:$('capture-f3'),captureC4:$('capture-c4'),applyCal:$('apply-calibration'),resetCal:$('reset-calibration'),
+  calibrationMessage:$('calibration-message'),f3Reference:$('f3-reference'),c4Reference:$('c4-reference'),correctionReadout:$('current-correction'),
   demo:$('demo-button'),reset:$('reset-button'),labels:$('label-mode'),camBtn:$('camera-button'),video:$('camera-video'),camPlaceholder:$('camera-placeholder'),flip:$('flip-camera'),
   results:$('results-screen'),resultAccuracy:$('result-accuracy'),resultAttempts:$('result-attempts'),resultIdeal:$('result-ideal'),resultWrong:$('result-wrong'),
   resultRestart:$('result-restart'),resultNext:$('result-next'),resultScoreCaption:$('result-score-caption')
@@ -28,7 +28,7 @@ let micStartTime=0;
 let maxInputLevel=0;
 let micWarned=false;
 let celebrationPlayed=false;
-const references={60:null,67:null};
+const references={53:null,60:null};
 let pendingCalibration=null;
 let calibrationResult=null;
 let captureTimer=null;
@@ -43,11 +43,11 @@ function calMessage(message,cls=''){
   elements.calibrationMessage.className='calibration-message'+(cls?' '+cls:'');
 }
 function updateCalibrationUI(){
+  elements.f3Reference.textContent='F3: '+(references[53]?.ok ? `${references[53].measured.toFixed(1)} Hz (${references[53].cents>=0?'+':''}${references[53].cents.toFixed(0)} cents)`:'not captured');
   elements.c4Reference.textContent='C4: '+(references[60]?.ok ? `${references[60].measured.toFixed(1)} Hz (${references[60].cents>=0?'+':''}${references[60].cents.toFixed(0)} cents)`:'not captured');
-  elements.g4Reference.textContent='G4: '+(references[67]?.ok ? `${references[67].measured.toFixed(1)} Hz (${references[67].cents>=0?'+':''}${references[67].cents.toFixed(0)} cents)`:'not captured');
   elements.correctionReadout.textContent=`Correction: ${Math.abs(microphone?.correctionCents||0)<.05?'OFF':`${microphone.correctionCents>0?'-':'+'}${Math.abs(microphone.correctionCents).toFixed(1)} cents applied`}`;
-  elements.captureC4.disabled=!!pendingCalibration;
-  elements.captureG4.disabled=!!pendingCalibration||!references[60]?.ok;
+  elements.captureF3.disabled=!!pendingCalibration;
+  elements.captureC4.disabled=!!pendingCalibration||!references[53]?.ok;
   elements.applyCal.disabled=!!pendingCalibration||!calibrationResult?.ok;
 }
 function finishReferenceCapture(){
@@ -59,11 +59,11 @@ function finishReferenceCapture(){
   const result=evaluateReference(midi,samples);
   if(!result.ok){calMessage(result.message,'warning');updateCalibrationUI();return;}
   references[midi]=result;
-  if(midi===60){
-    references[67]=null;calibrationResult=null;
-    calMessage(`C4 captured at ${result.measured.toFixed(1)} Hz. Next, press Capture G4 and hold the G above Middle C.`,'success');
+  if(midi===53){
+    references[60]=null;calibrationResult=null;
+    calMessage(`F3 captured at ${result.measured.toFixed(1)} Hz. Next, press Capture C4 and hold the C4 key (the fifth white key).`,'success');
   }else{
-    calibrationResult=compareReferences(references[60],references[67]);
+    calibrationResult=compareReferences(references[53],references[60]);
     calMessage(calibrationResult.message,calibrationResult.ok?(calibrationResult.large?'warning':'success'):'warning');
   }
   updateCalibrationUI();
@@ -72,8 +72,8 @@ function startReferenceCapture(midi){
   if(!microphone?.running){calMessage('Start listening and select your microphone first.','warning');return;}
   if(pendingCalibration)return;
   suppressUntil=Date.now()+5000;
-  if(midi===60){references[60]=null;references[67]=null;calibrationResult=null;}
-  if(midi===67&&!references[60]?.ok){calMessage('Capture C4 before G4.','warning');return;}
+  if(midi===53){references[53]=null;references[60]=null;calibrationResult=null;}
+  if(midi===60&&!references[53]?.ok){calMessage('Capture F3 before C4.','warning');return;}
   microphone.history=[];microphone.lastCandidate=null;microphone.hits=0;microphone.latched=null;
   pendingCalibration={midi,samples:[]};
   calMessage(`Capture active: play ONLY ${midiToName(midi)} now and hold for 2 seconds. Don't play a chord.`);
@@ -85,12 +85,12 @@ function applyReferenceCorrection(){
   if(!calibrationResult?.ok)return;
   microphone.setCorrection(calibrationResult.correction);
   const applied=Math.abs(calibrationResult.correction).toFixed(1);
-  calMessage(`Applied measured software offset (${applied} cents). Check C4 and G4 again by ear. This does not tune the physical piano.${calibrationResult.large?' WARNING: A full-semitone offset often means the keyboard is transposed. Reset its transpose setting if possible.':''}`,'success');
+  calMessage(`Applied measured software offset (${applied} cents). Check F3 and C4 again by ear. This does not tune the physical piano.${calibrationResult.large?' WARNING: A full-semitone offset often means the keyboard is transposed. Reset its transpose setting if possible.':''}`,'success');
   updateCalibrationUI();
 }
 function resetReferenceCorrection(){
   microphone.setCorrection(0);pendingCalibration=null;clearTimeout(captureTimer);captureTimer=null;
-  references[60]=null;references[67]=null;calibrationResult=null;
+  references[53]=null;references[60]=null;calibrationResult=null;
   calMessage('Correction cleared. The detector is using standard A4 = 440 Hz.');
   updateCalibrationUI();
 }
@@ -286,9 +286,9 @@ async function chooseMicDevice(){
 function checkNoteDetector(){
   const test=runPitchSelfTest();
   if(test.passed){
-    status(`Pitch algorithm PASS: generated C4 (${Math.round(test.frequency)} Hz) recognized correctly. This does NOT confirm the physical microphone is receiving sound.`,'success');
+    status(`Pitch algorithm PASS: generated F3 (${Math.round(test.frequency)} Hz) recognized correctly. This does NOT confirm the physical microphone is receiving sound.`,'success');
   }else{
-    status('Pitch algorithm FAILED on the known C4 test signal. Please report this test result so we can fix the note detector.','try-again');
+    status('Pitch algorithm FAILED on the known F3 test signal. Please report this test result so we can fix the note detector.','try-again');
   }
 }
 async function toggleCamera(){
@@ -374,8 +374,8 @@ async function boot(){
   elements.micDevice.addEventListener('change',chooseMicDevice);
   elements.micSensitivity.addEventListener('change',()=>{microphone.threshold=Number(elements.micSensitivity.value);});
   elements.micSelfTest.addEventListener('click',checkNoteDetector);
+  elements.captureF3.addEventListener('click',()=>startReferenceCapture(53));
   elements.captureC4.addEventListener('click',()=>startReferenceCapture(60));
-  elements.captureG4.addEventListener('click',()=>startReferenceCapture(67));
   elements.applyCal.addEventListener('click',applyReferenceCorrection);
   elements.resetCal.addEventListener('click',resetReferenceCorrection);
   updateCalibrationUI();

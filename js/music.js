@@ -1,7 +1,7 @@
 // Pure music helpers. A4=440 Hz, MIDI 60=C4 (scientific pitch notation).
 const NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-export const MIN_MIDI = 60; // C4 - toy piano low C
-export const MAX_MIDI = 84; // C6 - toy piano high C
+export const MIN_MIDI = 53; // F3: leftmost physical Hape toy key
+export const MAX_MIDI = 77; // F5: rightmost physical Hape toy key
 export const midiToName = midi => `${NAMES[((midi % 12) + 12) % 12]}${Math.floor(midi / 12) - 1}`;
 export const midiToFrequency = midi => 440 * 2 ** ((midi - 69) / 12);
 export const frequencyToMidi = hz => (hz > 0 ? Math.round(69 + 12 * Math.log2(hz / 440)) : null);

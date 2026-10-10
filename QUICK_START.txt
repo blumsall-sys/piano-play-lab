@@ -1,29 +1,19 @@
-NEW v1.8: FIVE MORE MELODIES
--------------------------
-Select lessons 5–9 from the Lesson menu, tap Read instructions, then Hear whole melody (optional).
-When the preview ends, play the glowing keys using the real toy piano or touch screen.
-Preview notes never count toward the score. See CHANGELOG_v1.8.md.
+PIANO PLAY LAB v1.8.1 - 9 LESSONS + MELODY PREVIEWS
 
-NEW v1.7 VOICE GUIDE
---------------------
-After launching the site, choose any lesson and tap "Read instructions".
-Optionally choose an English voice and a slower speaking speed.
-Tap "Stop voice" to end speech. Piano note scoring pauses during narration.
-Use Chrome on Android and allow microphone permission separately.
-See VOICE_GUIDE_SETUP_v1.7.md for full instructions.
+IMPORTANT: Close your OLD START_WINDOWS.bat server window FIRST.
 
-PIANO PLAY LAB 1.6 - F3 TO F5 TOY PIANO
+1. Extract the ZIP to a new folder, not on top of an old project.
+2. Open PianoPlay_Phase2A_v1.8.1 and run START_WINDOWS.bat.
+3. Open http://localhost:8000/?build=181 (not file://).
+4. Below the lesson selector, look for:
+   v1.8.1 READY · 9 lessons loaded · 5 timed melodies
+5. There are nine lessons; #5 is Twinkle Twinkle Little Star.
+6. Hear whole melody is displayed for every lesson.
+7. Select a melody, hear it, then play one note at a time.
 
-1. Unzip and open the PianoPlay_Phase2A folder.
-2. Double-click START_WINDOWS.bat (Windows) or run a localhost static server.
-3. Open http://localhost:8000 in Chrome.
-4. Click/tap the leftmost F3 key to confirm on-screen interaction.
-5. Start listening, allow microphone access, and play the physical leftmost key.
-6. It should sound near 174.61 Hz if F3 is correct.
-7. The fifth white key is C4 (261.63 Hz). Optional calibration: capture F3, then C4.
-8. Finish a lesson for chimes, score, restart/next.
+ANDROID / GITHUB PAGES:
+Upload the CONTENTS of the project folder to the ROOT of your GitHub Pages repo.
+Commit changes. Open https://YOURNAME.github.io/YOURREPO/?build=181
+If it still says 1.8 rather than 1.8.1, the site has old files or a cache.
 
-KEY RANGE: F3 to F5, 25 keys total (15 white, 10 black). No hardware buttons shown.
-ANDROID: host on GitHub Pages over HTTPS and use Chrome.
-
-See README.md and CHANGELOG_v1.6.md for notes.
+See RELEASE_FIX_v1.8.1.md for details.

@@ -1,9 +1,9 @@
 {
   "name": "piano-play-lab-phase-2a",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "private": true,
   "type": "module",
-  "description": "F3-F5 beginner piano trainer with 9 lessons, microphone and voice narration",
+  "description": "Stable 9-lesson F3–F5 toy piano trainer, rhythmic preview for every lesson, microphone and narration",
   "scripts": {
     "test": "node --test tests/*.test.mjs"
   }

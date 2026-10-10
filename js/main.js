@@ -1,10 +1,10 @@
-import {Keyboard} from './keyboard.js?v=1.8';
-import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=1.8';
-import {LessonEngine} from './lesson.js?v=1.8';
-import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=1.8';
-import {soundNote,soundChime,soundCelebration,soundMelody} from './sound.js?v=1.8';
-import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=1.8';
-import {VoiceGuide} from './voice-guide.js?v=1.8';
+import {Keyboard} from './keyboard.js?v=1.8.1';
+import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=1.8.1';
+import {LessonEngine} from './lesson.js?v=1.8.1';
+import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=1.8.1';
+import {soundNote,soundChime,soundCelebration,soundMelody} from './sound.js?v=1.8.1';
+import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=1.8.1';
+import {VoiceGuide} from './voice-guide.js?v=1.8.1';
 
 const $=id=>document.getElementById(id);
 const elements={
@@ -19,7 +19,7 @@ const elements={
   results:$('results-screen'),resultAccuracy:$('result-accuracy'),resultAttempts:$('result-attempts'),resultIdeal:$('result-ideal'),resultWrong:$('result-wrong'),
   resultRestart:$('result-restart'),resultNext:$('result-next'),resultScoreCaption:$('result-score-caption'),
   voiceRead:$('voice-read'),voiceStop:$('voice-stop'),voiceStatus:$('voice-status'),voiceScript:$('voice-script'),voiceChoice:$('voice-choice'),voiceRate:$('voice-rate'),
-  melodyButton:$('melody-button'),melodyStop:$('melody-stop'),melodyMessage:$('melody-message')
+  melodyButton:$('melody-button'),melodyStop:$('melody-stop'),melodyMessage:$('melody-message'),releaseStatus:$('release-status')
 };
 let engine;
 let microphone;
@@ -161,12 +161,12 @@ function showResults(){
 }
 function render(){
   const {lesson,position,length,done,target,summary}=engine.state();
-  const hasMelody=Array.isArray(lesson.melodyBeats);
+  const hasMelody=Array.isArray(lesson.notes) && lesson.notes.length>0;
   elements.melodyButton.hidden=!hasMelody;
   elements.melodyStop.hidden=!hasMelody||!previewActive;
   elements.melodyButton.disabled=previewActive;
   elements.melodyMessage.hidden=!hasMelody;
-  if(hasMelody&&!previewActive) elements.melodyMessage.textContent='Listen to the whole melody first, then play the golden keys one at a time. Rhythm is demonstrated, not graded.';
+  if(hasMelody&&!previewActive) elements.melodyMessage.textContent=Array.isArray(lesson.melodyBeats)?'Hear the rhythm of this melody, then play the golden keys one at a time.':'Listen to the full note sequence, then play the golden keys one at a time.';
   elements.voiceScript.textContent=lesson.spokenInstructions||lesson.description;
   elements.title.textContent=done?'Amazing work! ✨':lesson.title;
   elements.description.textContent=lesson.description;
@@ -255,7 +255,7 @@ function stopMelodyPreview({quiet=false}={}) {
 async function hearWholeMelody(){
   if(!engine || previewActive || pendingCalibration)return;
   const lesson=engine.lesson;
-  if(!Array.isArray(lesson.melodyBeats))return;
+  if(!Array.isArray(lesson.notes)||!lesson.notes.length)return;
   if(voice?.isSpeaking)stopVoice();
   const token=++previewEpoch;
   previewActive=true;
@@ -278,7 +278,7 @@ async function hearWholeMelody(){
     status('Now it is your turn. Play the highlighted note!','success');
   };
   try{
-    const handle=await soundMelody(lesson.notes,lesson.melodyBeats,lesson.bpm||90,{
+    const handle=await soundMelody(lesson.notes,lesson.melodyBeats ?? lesson.notes.map(()=>1),lesson.bpm||90,{
       onNote:midi=>{
         if(token!==previewEpoch)return;
         keyboard.pulse(midi);
@@ -480,26 +480,34 @@ async function boot(){
   elements.voiceChoice.addEventListener('change',()=>voice.setVoice(elements.voiceChoice.value));
   elements.voiceRate.addEventListener('change',()=>voice.setSpeed(Number(elements.voiceRate.value)));
   microphone=new MicrophoneDetector(onFrame,({midi})=>submitNote(midi,'mic'),error=>{microphone.lastError=error.message;status(error.message,'try-again');setTimeout(updateMicButton,80);});
-  await refreshMicrophones();
+  // Source of truth for this deployed build is embedded in index.html.
+  // This prevents a stale, cached lessons.json from silently reverting to four lessons.
+  // Refreshing microphone device names must not block lesson initialization.
   try {
-    const response=await fetch('./lessons/lessons.json');
-    if(!response.ok)throw new Error(`HTTP ${response.status} while loading lessons`);
-    engine=new LessonEngine(await response.json());
+    const catalogText=$('embedded-lessons')?.textContent;
+    if(!catalogText)throw new Error('Embedded lesson catalog is missing. Upload the v1.8.1 index.html.');
+    const catalog=JSON.parse(catalogText);
+    if(catalog.length!==9)throw new Error(`Expected 9 lessons in v1.8.1, received ${catalog.length}.`);
+    engine=new LessonEngine(catalog);
     elements.lesson.replaceChildren();
     engine.lessons.forEach((lesson,i)=>{
       const option=document.createElement('option');option.value=lesson.id;option.textContent=`${i+1} · ${lesson.title}`;
       elements.lesson.append(option);
     });
+    elements.releaseStatus.textContent=`v1.8.1 READY · ${engine.lessons.length} lessons loaded · ${engine.lessons.filter(l=>Array.isArray(l.melodyBeats)).length} timed melodies`;
     render();
-    status('Find the golden key. Press Start listening or tap an on-screen key to begin.');
+    status('Nine lessons ready. Select a melody, tap Hear whole melody, or play the golden key.');
     if(!window.isSecureContext)status('Microphone and camera require HTTPS (GitHub Pages) or localhost. This page is not in a secure context.','try-again');
   }catch(error){
-    console.error(error);
-    status('Could not load lesson files. Start the local server instead of opening index.html directly. '+error.message,'try-again');
+    console.error('Piano Play bootstrap error:',error);
+    elements.releaseStatus.textContent='VERSION ERROR: '+error.message;
+    status('Could not initialize lesson engine. '+error.message,'try-again');
     elements.micBtn.disabled=true;
     elements.demo.disabled=true;
     return;
   }
+  // Best effort: listing device labels can be slow or fail on Android.
+  void refreshMicrophones();
   elements.lesson.addEventListener('change',()=>{
     syncVoiceLesson();
     celebrationPlayed=false;

@@ -1,4 +1,4 @@
-import {MIN_MIDI,MAX_MIDI} from './music.js?v=1.8';
+import {MIN_MIDI,MAX_MIDI} from './music.js?v=1.8.1';
 export function validateLessons(lessons) {
   if(!Array.isArray(lessons)||!lessons.length) throw new Error('Lesson file has no lessons.');
   const ids=new Set();

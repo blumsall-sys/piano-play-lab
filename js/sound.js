@@ -1,5 +1,5 @@
-import {buildMelodyTimeline} from './melody.js?v=1.8';
-import {midiToFrequency} from './music.js?v=1.8';
+import {buildMelodyTimeline} from './melody.js?v=1.8.1';
+import {midiToFrequency} from './music.js?v=1.8.1';
 let ctx;
 async function ensureContext(){
   ctx ??= new (window.AudioContext||window.webkitAudioContext)();

@@ -159,3 +159,6 @@ button,.btn,select{min-height:44px}
 #melody-button:not([hidden]){background:#fff0c8;border-color:#e7cb7c;color:#765110}
 #melody-stop:not([hidden]){background:#fff0e7;border-color:#ebcbbb;color:#854f40}
 #melody-button:disabled{opacity:.55}
+
+/* v1.8.1: visible app readiness status */
+.release-status{font-size:12px;font-weight:750;color:#306b60;margin:10px 0 0}.release-status:empty{display:none}

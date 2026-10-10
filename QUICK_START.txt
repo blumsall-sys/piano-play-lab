@@ -1,3 +1,17 @@
+NEW v1.8: FIVE MORE MELODIES
+-------------------------
+Select lessons 5–9 from the Lesson menu, tap Read instructions, then Hear whole melody (optional).
+When the preview ends, play the glowing keys using the real toy piano or touch screen.
+Preview notes never count toward the score. See CHANGELOG_v1.8.md.
+
+NEW v1.7 VOICE GUIDE
+--------------------
+After launching the site, choose any lesson and tap "Read instructions".
+Optionally choose an English voice and a slower speaking speed.
+Tap "Stop voice" to end speech. Piano note scoring pauses during narration.
+Use Chrome on Android and allow microphone permission separately.
+See VOICE_GUIDE_SETUP_v1.7.md for full instructions.
+
 PIANO PLAY LAB 1.6 - F3 TO F5 TOY PIANO
 
 1. Unzip and open the PianoPlay_Phase2A folder.

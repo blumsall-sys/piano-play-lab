@@ -1,4 +1,4 @@
-import {midiToFrequency} from './music.js?v=1.6';
+import {midiToFrequency} from './music.js?v=1.8';
 
 export const centsBetween = (measured, reference) =>
   measured > 0 && reference > 0 ? 1200 * Math.log2(measured / reference) : NaN;

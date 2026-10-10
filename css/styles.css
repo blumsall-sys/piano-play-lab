@@ -141,3 +141,21 @@ button,.btn,select{min-height:44px}
 #keyboard .key-label.dark{font-size:9px}
 @media(max-width:900px){#keyboard{width:785px;min-width:785px;max-width:none}}
 @media(max-width:600px){#keyboard{width:785px;min-width:785px;max-width:none}}
+/* v1.7 Browser speech instruction panel */
+.voice-guide{background:#f4faf8;border:1px solid #d5e9e2;border-radius:16px;margin:0 0 20px;padding:16px 18px}
+.voice-topline{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.voice-topline h3{font-size:18px;letter-spacing:-.02em;margin:4px 0 0}
+.voice-status{font-size:12px;color:#40756b;max-width:290px;text-align:right;line-height:1.4}
+.voice-script{font-size:13px;line-height:1.7;color:#3d5251;margin:10px 0 15px}
+.voice-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.voice-actions label{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:750;color:#526c65;min-width:145px;flex:1}
+.voice-actions select{font:inherit;font-size:13px;min-height:44px;max-width:330px;padding:8px 12px;border-radius:10px;border:1px solid #c9ddd4;background:white;color:var(--ink);width:100%}
+.voice-actions .btn{min-height:44px}
+.voice-note{font-size:11px;color:#647b74;line-height:1.5;margin:12px 0 0}
+@media(max-width:650px){.voice-topline{flex-direction:column;gap:5px}.voice-status{text-align:left;max-width:none}.voice-actions .btn{flex:1 1 calc(50% - 10px)}.voice-actions label{min-width:calc(50% - 10px)}.voice-guide{padding:15px 13px}}
+@media(max-width:380px){.voice-actions label{min-width:100%}.voice-actions .btn{flex:1 1 100%}}
+/* v1.8: optional recognizable rhythmic tune preview */
+.melody-message{font-size:12px;line-height:1.55;color:#446a6a;background:#eef8f5;border-radius:9px;padding:10px 13px;margin:12px 0 0}
+#melody-button:not([hidden]){background:#fff0c8;border-color:#e7cb7c;color:#765110}
+#melody-stop:not([hidden]){background:#fff0e7;border-color:#ebcbbb;color:#854f40}
+#melody-button:disabled{opacity:.55}

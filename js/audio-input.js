@@ -1,6 +1,6 @@
-import {pitchYin,rmsOf} from './pitch.js?v=1.6';
-import {frequencyToMidi,MIN_MIDI,MAX_MIDI} from './music.js?v=1.6';
-import {applyCorrection,centsBetween,median} from './calibration.js?v=1.6';
+import {pitchYin,rmsOf} from './pitch.js?v=1.8';
+import {frequencyToMidi,MIN_MIDI,MAX_MIDI} from './music.js?v=1.8';
+import {applyCorrection,centsBetween,median} from './calibration.js?v=1.8';
 
 // Audio-fix 1.2: analyse the ORIGINAL sample stream (no lossy 4x averaging),
 // apply stable-frame median filtering, and expose raw + corrected pitches.

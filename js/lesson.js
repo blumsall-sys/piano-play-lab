@@ -1,4 +1,4 @@
-import {MIN_MIDI,MAX_MIDI} from './music.js?v=1.6';
+import {MIN_MIDI,MAX_MIDI} from './music.js?v=1.8';
 export function validateLessons(lessons) {
   if(!Array.isArray(lessons)||!lessons.length) throw new Error('Lesson file has no lessons.');
   const ids=new Set();
@@ -7,6 +7,10 @@ export function validateLessons(lessons) {
     if(ids.has(lesson.id)) throw new Error('Duplicate lesson ID: '+lesson.id);
     ids.add(lesson.id);
     for(const midi of lesson.notes) if(!Number.isInteger(midi)||midi<MIN_MIDI||midi>MAX_MIDI) throw new Error(`Lesson ${lesson.id} has an out-of-range MIDI note: ${midi}`);
+    if(lesson.melodyBeats!==undefined){
+      if(!Array.isArray(lesson.melodyBeats)||lesson.melodyBeats.length!==lesson.notes.length||!lesson.melodyBeats.every(b=>Number.isFinite(b)&&b>0&&b<=8)) throw new Error(`Lesson ${lesson.id} has invalid melody beat values.`);
+    }
+    if(lesson.bpm!==undefined && (!Number.isFinite(lesson.bpm)||lesson.bpm<40||lesson.bpm>180)) throw new Error(`Lesson ${lesson.id} has invalid tempo.`);
   }
   return lessons;
 }

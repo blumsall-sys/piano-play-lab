@@ -6,14 +6,14 @@
   <meta name="theme-color" content="#fff8ed">
   <meta name="description" content="Piano Play Lab: practice beginner piano notes with an interactive toy piano and live microphone detection.">
   <link rel="icon" href="./assets/logo-mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./css/styles.css?v=1.6">
+  <link rel="stylesheet" href="./css/styles.css?v=1.8">
   <title>Piano Play Lab · Phase 2A</title>
 </head>
 <body>
   <div class="app-shell">
     <header class="site-header">
       <div class="brand"><img src="./assets/logo-mark.svg" alt="" width="47" height="47"><div><strong>Piano Play <span>Lab</span></strong><small>Learn a little. Play a lot.</small></div></div>
-      <span class="version-chip">INTERACTIVE DEMO · 2A / F3–F5 KEYS 1.6</span>
+      <span class="version-chip">INTERACTIVE DEMO · 2A / MELODY COLLECTION 1.8</span>
     </header>
 
     <main>
@@ -25,6 +25,24 @@
       <section class="lesson-top panel" aria-labelledby="lesson-title">
         <div class="lesson-heading"><div><span class="eyebrow">CHOOSE AN ADVENTURE</span><h2 id="lesson-title">Ready to make music?</h2></div><label class="select-wrap">Lesson <select id="lesson-select" aria-label="Choose a lesson"><option value="middle-c">1 · Find the First F</option><option value="five-fingers">2 · Five-Finger Walk</option><option value="little-melody">3 · Little Melody</option><option value="high-low">4 · High and Low</option></select></label></div>
         <p class="lesson-description" id="lesson-description">Find the first F key on your keyboard.</p>
+        <section class="voice-guide panel-inline" aria-label="Voice instructions for the current lesson">
+          <div class="voice-topline">
+            <div><span class="eyebrow">🎧 VOICE GUIDE</span><h3>Listen to your lesson</h3></div>
+            <span class="voice-status" id="voice-status" role="status" aria-live="polite">Tap Read instructions to hear your lesson.</span>
+          </div>
+          <p class="voice-script" id="voice-script">Choose a lesson, then tap Read instructions to listen.</p>
+          <div class="voice-actions">
+            <button class="btn btn-primary" type="button" id="voice-read">▶ Read instructions</button>
+            <button class="btn btn-secondary" type="button" id="voice-stop" disabled>■ Stop voice</button>
+            <label for="voice-choice">English voice
+              <select id="voice-choice" aria-label="Choose English narration voice"><option value="">Automatic English voice</option></select>
+            </label>
+            <label for="voice-rate">Talking speed
+              <select id="voice-rate" aria-label="Narration speaking speed"><option value="0.78">Slow</option><option value="0.88" selected>Gentle</option><option value="1">Normal</option><option value="1.12">Fast</option></select>
+            </label>
+          </div>
+          <p class="voice-note">Narration is optional and starts only when tapped. The microphone still shows levels, but lesson scoring pauses while the voice is speaking and briefly afterward. Voice selection depends on the device.</p>
+        </section>
         <div class="status-grid">
           <div class="status-card target-card"><span class="status-label">PLAY THIS NOTE</span><strong id="target-note" aria-live="polite">F3</strong><span id="target-hint" class="subtle">The first F key</span></div>
           <div class="status-card"><span class="status-label">YOUR PIANO PLAYED</span><strong id="heard-note" aria-live="polite">—</strong><span id="heard-details" class="subtle">Turn on the mic to listen</span></div>
@@ -43,9 +61,12 @@
           <button class="btn btn-primary" id="mic-button" type="button"><span id="mic-icon">●</span><span id="mic-button-text">Start listening</span></button>
           <button class="btn btn-secondary" id="resume-audio-button" type="button" hidden>↻ Resume microphone audio</button>
           <button class="btn btn-secondary" id="demo-button" type="button">▶ Hear next note</button>
+          <button class="btn btn-secondary" id="melody-button" type="button" hidden>♫ Hear whole melody</button>
+          <button class="btn btn-secondary" id="melody-stop" type="button" hidden>■ Stop melody</button>
           <button class="btn btn-secondary" id="reset-button" type="button">↺ Restart lesson</button>
           <label class="toggle-control" for="label-mode">Key labels <select id="label-mode"><option value="all">All notes</option><option value="f">F only</option><option value="none">Hidden</option></select></label>
         </div>
+        <p class="melody-message" id="melody-message" role="status" aria-live="polite" hidden>Listen to the melody, then play it on your piano.</p>
         <section class="mic-tools" aria-label="Microphone setup and troubleshooting">
           <div class="mic-settings">
             <label for="mic-device">Microphone input
@@ -110,6 +131,6 @@
       <footer><span>Made for curious little musicians ♪</span><span>Phase 2A · Android/tablet compatible · No account required</span></footer>
     </main>
   </div>
-  <script type="module" src="./js/main.js?v=1.6"></script>
+  <script type="module" src="./js/main.js?v=1.8"></script>
 </body>
 </html>

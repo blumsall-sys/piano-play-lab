@@ -1,9 +1,10 @@
-import {Keyboard} from './keyboard.js?v=1.6';
-import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=1.6';
-import {LessonEngine} from './lesson.js?v=1.6';
-import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=1.6';
-import {soundNote,soundChime,soundCelebration} from './sound.js?v=1.6';
-import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=1.6';
+import {Keyboard} from './keyboard.js?v=1.8';
+import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=1.8';
+import {LessonEngine} from './lesson.js?v=1.8';
+import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=1.8';
+import {soundNote,soundChime,soundCelebration,soundMelody} from './sound.js?v=1.8';
+import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=1.8';
+import {VoiceGuide} from './voice-guide.js?v=1.8';
 
 const $=id=>document.getElementById(id);
 const elements={
@@ -16,11 +17,14 @@ const elements={
   calibrationMessage:$('calibration-message'),f3Reference:$('f3-reference'),c4Reference:$('c4-reference'),correctionReadout:$('current-correction'),
   demo:$('demo-button'),reset:$('reset-button'),labels:$('label-mode'),camBtn:$('camera-button'),video:$('camera-video'),camPlaceholder:$('camera-placeholder'),flip:$('flip-camera'),
   results:$('results-screen'),resultAccuracy:$('result-accuracy'),resultAttempts:$('result-attempts'),resultIdeal:$('result-ideal'),resultWrong:$('result-wrong'),
-  resultRestart:$('result-restart'),resultNext:$('result-next'),resultScoreCaption:$('result-score-caption')
+  resultRestart:$('result-restart'),resultNext:$('result-next'),resultScoreCaption:$('result-score-caption'),
+  voiceRead:$('voice-read'),voiceStop:$('voice-stop'),voiceStatus:$('voice-status'),voiceScript:$('voice-script'),voiceChoice:$('voice-choice'),voiceRate:$('voice-rate'),
+  melodyButton:$('melody-button'),melodyStop:$('melody-stop'),melodyMessage:$('melody-message')
 };
 let engine;
 let microphone;
 let keyboard;
+let voice;
 let cameraStream=null;
 let suppressUntil=0;
 let lastWrongAt=0;
@@ -28,10 +32,56 @@ let micStartTime=0;
 let maxInputLevel=0;
 let micWarned=false;
 let celebrationPlayed=false;
+let previewActive=false;
+let previewHandle=null;
+let previewEpoch=0;
 const references={53:null,60:null};
 let pendingCalibration=null;
 let calibrationResult=null;
 let captureTimer=null;
+
+function clearMicLatch(){
+  if(!microphone)return;
+  microphone.latched=null;
+  microphone.lastCandidate=null;
+  microphone.hits=0;
+  microphone.quietFrames=0;
+  microphone.history=[];
+}
+function voiceState({type,message}){
+  elements.voiceStatus.textContent=message;
+  elements.voiceStatus.dataset.state=type;
+  const speaking=type==='speaking';
+  elements.voiceStop.disabled=!speaking;
+  elements.voiceRead.textContent=speaking?'↻ Replay instructions':'▶ Read instructions';
+}
+function refreshVoiceChoices(){
+  if(!voice?.supported)return;
+  const selected=elements.voiceChoice.value;
+  const voices=voice.refreshVoices();
+  elements.voiceChoice.replaceChildren(new Option('Automatic English voice',''));
+  for(const v of voices){
+    elements.voiceChoice.add(new Option(`${v.name} (${v.lang})`,v.voiceURI));
+  }
+  if(voices.some(v=>v.voiceURI===selected))elements.voiceChoice.value=selected;
+  else if(voices.some(v=>v.voiceURI===voice.preferredURI))elements.voiceChoice.value=voice.preferredURI;
+  else elements.voiceChoice.value='';
+}
+function readInstructions(){
+  if(!engine||!voice)return;
+  stopMelodyPreview();
+  if(pendingCalibration){
+    status('Finish the piano reference capture before playing voice instructions.','try-again');
+    return;
+  }
+  voice.speak(engine.lesson.spokenInstructions || `${engine.lesson.title}. ${engine.lesson.description} ${engine.lesson.hint}`);
+}
+function stopVoice(){voice?.stop();}
+function syncVoiceLesson(){
+  stopMelodyPreview();
+  stopVoice();
+  if(engine) elements.voiceScript.textContent=engine.lesson.spokenInstructions || engine.lesson.description;
+}
 
 function noteText(midi){return midiToName(midi).replace('#','♯');}
 function status(text,type=''){
@@ -69,6 +119,7 @@ function finishReferenceCapture(){
   updateCalibrationUI();
 }
 function startReferenceCapture(midi){
+  if(voice?.isSpeaking){calMessage('Stop voice narration before capturing a piano reference note.','warning');return;}
   if(!microphone?.running){calMessage('Start listening and select your microphone first.','warning');return;}
   if(pendingCalibration)return;
   suppressUntil=Date.now()+5000;
@@ -110,6 +161,13 @@ function showResults(){
 }
 function render(){
   const {lesson,position,length,done,target,summary}=engine.state();
+  const hasMelody=Array.isArray(lesson.melodyBeats);
+  elements.melodyButton.hidden=!hasMelody;
+  elements.melodyStop.hidden=!hasMelody||!previewActive;
+  elements.melodyButton.disabled=previewActive;
+  elements.melodyMessage.hidden=!hasMelody;
+  if(hasMelody&&!previewActive) elements.melodyMessage.textContent='Listen to the whole melody first, then play the golden keys one at a time. Rhythm is demonstrated, not graded.';
+  elements.voiceScript.textContent=lesson.spokenInstructions||lesson.description;
   elements.title.textContent=done?'Amazing work! ✨':lesson.title;
   elements.description.textContent=lesson.description;
   elements.target.textContent=done?'★':noteText(target);
@@ -135,7 +193,7 @@ async function handleCorrectFeedback(done){
 }
 async function submitNote(midi,source){
   if(!engine)return;
-  if(source==='mic'&&(Date.now()<suppressUntil || pendingCalibration))return;
+  if(source==='mic'&&(previewActive || voice?.isSpeaking || Date.now()<suppressUntil || pendingCalibration))return;
   keyboard.pulse(midi);
   keyboard.setDetected(midi);
   if(source==='screen') {
@@ -160,6 +218,7 @@ async function submitNote(midi,source){
   }
 }
 async function playOnScreen(midi){
+  stopMelodyPreview();
   suppressUntil=Date.now()+1100;
   await submitNote(midi,'screen');
   try {await soundNote(midi,{duration:.45});}
@@ -167,12 +226,74 @@ async function playOnScreen(midi){
 }
 async function demonstrate(){
   if(!engine||engine.state().done)return;
+  stopMelodyPreview();
   const target=engine.target;
   suppressUntil=Date.now()+1450;
   keyboard.pulse(target);
   status(`Listen to ${noteText(target)}. Now find and play it yourself!`);
   try{await soundNote(target,{duration:.75});}
   catch(error){status('Browser audio is unavailable. You can still use the toy piano keyboard.');}
+}
+function stopMelodyPreview({quiet=false}={}) {
+  const wasPlaying=previewActive;
+  previewEpoch++;
+  previewActive=false;
+  previewHandle?.cancel();
+  previewHandle=null;
+  if(elements.melodyButton)elements.melodyButton.disabled=false;
+  if(elements.melodyStop)elements.melodyStop.hidden=true;
+  if(wasPlaying){
+    keyboard?.setDetected(null);
+    clearMicLatch();
+    suppressUntil=Date.now()+950;
+    if(!quiet){
+      elements.melodyMessage.textContent='Melody stopped. Now try playing the gold notes!';
+      status('Melody stopped. Now play the highlighted note.');
+    }
+  }
+}
+async function hearWholeMelody(){
+  if(!engine || previewActive || pendingCalibration)return;
+  const lesson=engine.lesson;
+  if(!Array.isArray(lesson.melodyBeats))return;
+  if(voice?.isSpeaking)stopVoice();
+  const token=++previewEpoch;
+  previewActive=true;
+  suppressUntil=Infinity;
+  clearMicLatch();
+  elements.melodyButton.disabled=true;
+  elements.melodyStop.hidden=false;
+  elements.melodyMessage.textContent=`Playing ${lesson.title}. Watch the keys light up!`;
+  status('Listen first! Lesson scoring is paused during the melody preview.');
+  const finish=()=>{
+    if(token!==previewEpoch)return;
+    previewActive=false;
+    previewHandle=null;
+    suppressUntil=Date.now()+1100;
+    clearMicLatch();
+    keyboard.setDetected(null);
+    elements.melodyButton.disabled=false;
+    elements.melodyStop.hidden=true;
+    elements.melodyMessage.textContent='Your turn! Play the golden keys one note at a time.';
+    status('Now it is your turn. Play the highlighted note!','success');
+  };
+  try{
+    const handle=await soundMelody(lesson.notes,lesson.melodyBeats,lesson.bpm||90,{
+      onNote:midi=>{
+        if(token!==previewEpoch)return;
+        keyboard.pulse(midi);
+        keyboard.setDetected(midi);
+      },
+      onEnd:finish
+    });
+    if(token!==previewEpoch){handle.cancel();return;}
+    previewHandle=handle;
+  }catch(error){
+    if(token!==previewEpoch)return;
+    stopMelodyPreview({quiet:true});
+    elements.melodyMessage.textContent='Could not play the melody: '+error.message;
+    status('Audio playback could not start. You can still practice one note at a time.','try-again');
+  }
 }
 function onFrame({rms,peak,db,midi,rawMidi,frequency,rawFrequency,clarity,cents,correctionCents,reason,threshold,contextState,trackState,trackLabel,sampleRate}){
   elements.resumeAudio.hidden=reason!=='audio-suspended';
@@ -183,6 +304,13 @@ function onFrame({rms,peak,db,midi,rawMidi,frequency,rawFrequency,clarity,cents,
   maxInputLevel=Math.max(maxInputLevel,rms);
   const deviceLabel=trackLabel||'Unknown microphone';
   elements.micDebug.textContent=`Input: ${deviceLabel} · ${contextState} audio context · ${trackState} track · ${sampleRate||'?'} Hz · RMS ${rms.toFixed(5)} · Peak ${(peak||0).toFixed(4)} · Gate ${threshold}`;
+  if(voice?.isSpeaking || previewActive){
+    elements.heard.textContent='—';
+    elements.heardDetails.textContent=previewActive?'Melody demonstration is playing':'Voice instructions are playing';
+    elements.confidence.textContent=previewActive?'Lesson scoring paused for demonstration':'Lesson note scoring is paused for narration';
+    keyboard.setDetected(null);
+    return;
+  }
   if(rawFrequency){
     const measuredCents=centsBetween(rawFrequency,midiToFrequency(rawMidi));
     elements.rawReadout.textContent=`Raw microphone reading: ${rawFrequency.toFixed(2)} Hz · ${noteText(rawMidi)} · ${measuredCents>=0?'+':''}${measuredCents.toFixed(1)} cents from that note; reference adjustment ${correctionCents>=0?'+':''}${correctionCents.toFixed(1)} cents`;
@@ -312,6 +440,7 @@ async function toggleCamera(){
   }finally{elements.camBtn.disabled=false;}
 }
 function restartCurrentLesson(){
+  syncVoiceLesson();
   celebrationPlayed=false;
   keyboard.setDetected(null);
   engine.restart();
@@ -321,6 +450,7 @@ function restartCurrentLesson(){
 function moveToNextLesson(){
   const nextId=engine.state().nextLessonId;
   if(!nextId)return;
+  syncVoiceLesson();
   celebrationPlayed=false;
   keyboard.setDetected(null);
   engine.select(nextId);
@@ -330,6 +460,25 @@ function moveToNextLesson(){
 }
 async function boot(){
   keyboard=new Keyboard($('keyboard'),playOnScreen);
+  voice=new VoiceGuide({
+    onState:voiceState,
+    onBegin:()=>{suppressUntil=Infinity;clearMicLatch();},
+    onFinish:()=>{suppressUntil=Date.now()+1100;clearMicLatch();}
+  });
+  if(!voice.supported){
+    elements.voiceRead.disabled=true;
+    elements.voiceChoice.disabled=true;
+    elements.voiceRate.disabled=true;
+    voiceState({type:'unsupported',message:'Speech synthesis is not supported by this browser.'});
+  }else{
+    refreshVoiceChoices();
+    if(typeof voice.synth.addEventListener==='function')voice.synth.addEventListener('voiceschanged',refreshVoiceChoices);
+    else voice.synth.onvoiceschanged=refreshVoiceChoices;
+  }
+  elements.voiceRead.addEventListener('click',readInstructions);
+  elements.voiceStop.addEventListener('click',stopVoice);
+  elements.voiceChoice.addEventListener('change',()=>voice.setVoice(elements.voiceChoice.value));
+  elements.voiceRate.addEventListener('change',()=>voice.setSpeed(Number(elements.voiceRate.value)));
   microphone=new MicrophoneDetector(onFrame,({midi})=>submitNote(midi,'mic'),error=>{microphone.lastError=error.message;status(error.message,'try-again');setTimeout(updateMicButton,80);});
   await refreshMicrophones();
   try {
@@ -352,6 +501,7 @@ async function boot(){
     return;
   }
   elements.lesson.addEventListener('change',()=>{
+    syncVoiceLesson();
     celebrationPlayed=false;
     keyboard.setDetected(null);
     engine.select(elements.lesson.value);
@@ -362,6 +512,8 @@ async function boot(){
   elements.resultRestart.addEventListener('click',restartCurrentLesson);
   elements.resultNext.addEventListener('click',moveToNextLesson);
   elements.demo.addEventListener('click',demonstrate);
+  elements.melodyButton.addEventListener('click',hearWholeMelody);
+  elements.melodyStop.addEventListener('click',()=>stopMelodyPreview());
   elements.micBtn.addEventListener('click',toggleMic);
   elements.resumeAudio.addEventListener('click',async()=>{
     try{
@@ -386,6 +538,8 @@ async function boot(){
   // and camera streams while hidden. Explicit restart avoids stale audio and unwanted capture.
   let stoppedForBackground=false;
   const releaseBackgroundMedia=()=>{
+    stopMelodyPreview({quiet:true});
+    stopVoice();
     stoppedForBackground=!!microphone?.running||!!cameraStream;
     if(microphone?.running){void microphone.stop().finally(updateMicButton);}
     if(cameraStream){

@@ -1,4 +1,4 @@
-import {range,midiToName,isBlackKey} from './music.js?v=1.6';
+import {range,midiToName,isBlackKey} from './music.js?v=1.8';
 const NS='http://www.w3.org/2000/svg';
 function el(tag, attrs={}, text){
   const node=document.createElementNS(NS,tag);

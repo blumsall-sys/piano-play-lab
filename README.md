@@ -1,3 +1,11 @@
+# Piano Play Lab v1.8 — Nine Beginner Lessons
+
+**NEW:** Five melody lessons with optional rhythmic **Hear whole melody** playback, child-friendly voice narration and the existing F3–F5 25-key toy piano. See [CHANGELOG_v1.8.md](CHANGELOG_v1.8.md) for new songs, editing and GitHub steps.
+
+# Piano Play Lab v1.7 — F3–F5 Voice Guide
+
+**NEW:** This release adds a click-to-play voice guide for all four beginner lessons using the browser's free Web Speech API. See [VOICE_GUIDE_SETUP_v1.7.md](VOICE_GUIDE_SETUP_v1.7.md) for step-by-step Android, Windows and GitHub instructions.
+
 # Piano Play Lab v1.6 — F3 to F5 toy-piano range
 
 This update shifts the pitch labels and recognition by **one octave down** to match the observed leftmost key on the Hape miniature piano. The physical SVG key count and layout are unchanged: **25 keys, 15 white, 10 black**, with black-key groups **3–2–3–2**. There are no decorative toy-piano hardware buttons.

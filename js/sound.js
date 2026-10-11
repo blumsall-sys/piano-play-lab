@@ -1,12 +1,25 @@
 import {buildMelodyTimeline} from './melody.js?v=2.2';
 import {midiToFrequency} from './music.js?v=2.2';
 let ctx;
+// Separate, persistent mix levels: MIDI instrument and correct-note feedback.
+// These are linear gain ratios, not percentages of system/master volume.
+export const DEFAULT_MIDI_VOLUME=0.9;
+export const DEFAULT_CHIME_VOLUME=0.25;
+let midiVolume=DEFAULT_MIDI_VOLUME;
+let chimeVolume=DEFAULT_CHIME_VOLUME;
+let midiBus=null,feedbackBus=null;
+export const clampVolume=value=>Math.max(0,Math.min(1,Number.isFinite(Number(value))?Number(value):0));
+export function getAudioMix(){return {midi:midiVolume,chime:chimeVolume};}
+export function setMidiVolume(value){midiVolume=clampVolume(value);if(midiBus&&ctx)midiBus.gain.setTargetAtTime(midiVolume,ctx.currentTime,.012);return midiVolume;}
+export function setChimeVolume(value){chimeVolume=clampVolume(value);if(feedbackBus&&ctx)feedbackBus.gain.setTargetAtTime(chimeVolume,ctx.currentTime,.012);return chimeVolume;}
 async function ensureContext(){
   ctx ??= new (window.AudioContext||window.webkitAudioContext)();
+  if(!midiBus){midiBus=ctx.createGain();midiBus.gain.value=midiVolume;midiBus.connect(ctx.destination);}
+  if(!feedbackBus){feedbackBus=ctx.createGain();feedbackBus.gain.value=chimeVolume;feedbackBus.connect(ctx.destination);}
   if(ctx.state==='suspended') await ctx.resume();
   return ctx;
 }
-function playTone(freq,{type='sine',when=0,duration=.3,volume=.12,attack=.01,release=.18,detune=0}={}){
+function playTone(freq,{type='sine',when=0,duration=.3,volume=.12,attack=.01,release=.18,detune=0,destination=null}={}){
   const osc=ctx.createOscillator();
   const gain=ctx.createGain();
   osc.type=type;
@@ -15,7 +28,7 @@ function playTone(freq,{type='sine',when=0,duration=.3,volume=.12,attack=.01,rel
   gain.gain.setValueAtTime(0.0001,when);
   gain.gain.exponentialRampToValueAtTime(Math.max(0.0001,volume),when+attack);
   gain.gain.exponentialRampToValueAtTime(0.0001,when+duration+release);
-  osc.connect(gain).connect(ctx.destination);
+  osc.connect(gain).connect(destination||ctx.destination);
   osc.start(when);
   osc.stop(when+duration+release+.02);
   return {osc,gain};
@@ -32,16 +45,16 @@ export async function soundChime(){
   await ensureContext();
   const when=ctx.currentTime;
   [0,4,7].forEach((step,i)=>{
-    playTone(midiToFrequency(84+step),{when:when+i*.05,duration:.18,volume:.08,type:'triangle',attack:.008,release:.22});
-    playTone(midiToFrequency(96+step),{when:when+i*.05,duration:.12,volume:.028,type:'sine',attack:.006,release:.18});
+    playTone(midiToFrequency(84+step),{when:when+i*.05,duration:.18,volume:.08,type:'triangle',attack:.008,release:.22,destination:feedbackBus});
+    playTone(midiToFrequency(96+step),{when:when+i*.05,duration:.12,volume:.028,type:'sine',attack:.006,release:.18,destination:feedbackBus});
   });
 }
 export async function soundCelebration(){
   await ensureContext();
   const when=ctx.currentTime;
   [72,76,79,84].forEach((midi,i)=>{
-    playTone(midiToFrequency(midi),{when:when+i*.11,duration:.26,volume:.1,type:'triangle',attack:.008,release:.28});
-    playTone(midiToFrequency(midi+12),{when:when+i*.11,duration:.16,volume:.03,type:'sine',attack:.008,release:.22});
+    playTone(midiToFrequency(midi),{when:when+i*.11,duration:.26,volume:.1,type:'triangle',attack:.008,release:.28,destination:feedbackBus});
+    playTone(midiToFrequency(midi+12),{when:when+i*.11,duration:.16,volume:.03,type:'sine',attack:.008,release:.22,destination:feedbackBus});
   });
 }
 
@@ -108,7 +121,7 @@ export async function midiSoundOn(note,velocity=96){
     gain.gain.setValueAtTime(.0001,now);
     gain.gain.exponentialRampToValueAtTime(Math.max(.0001,loud*amount),now+.012);
     gain.gain.setTargetAtTime(Math.max(.0001,loud*amount*.42),now+.14,.22);
-    osc.connect(gain).connect(ctx.destination);osc.start(now);
+    osc.connect(gain).connect(midiBus);osc.start(now);
     voices.push({osc,gain});
   }
   midiVoices.set(note,voices);

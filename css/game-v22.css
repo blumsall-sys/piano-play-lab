@@ -192,3 +192,29 @@ html{scroll-behavior:smooth}body{background:#f4f7fa;color:var(--game-ink)}
 .midi-practice-connect:not([hidden]){display:inline-flex;align-items:center;justify-content:center}
 .midi-practice-connect[hidden]{display:none!important}
 @media(max-width:650px){.midi-connection-tools button{width:100%}}
+
+/* v2.7 · Audio mix / place the controls above the Rhythm Highway */
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important}
+.game-player .rhythm-panel{margin:4px 0 5px!important;padding:8px 11px!important}
+.game-player .rhythm-panel .rhythm-controls{margin:0 0 5px}
+.game-player .rhythm-panel .rhythm-hud{margin:2px 0 0}
+.game-player .highway-box{margin:0 0 5px}
+.game-player .piano-panel{margin-top:3px!important}
+.game-player .piano-panel .keyboard-scroll{margin-top:0}
+.highway-key{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.highway-key .piano-mini-legend{margin-left:auto;display:flex;gap:12px;align-items:center;color:#e0eef5;font-size:11px}
+.highway-key .piano-mini-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;margin-right:5px}
+.highway-key .piano-mini-legend .guide{background:#ffcb5e}
+.highway-key .piano-mini-legend .played{background:#43c4aa}
+.quick-sound-mix{margin-top:6px;padding:3px 9px 5px;border:1px solid #e1e9e6;border-radius:9px;background:#f7faf9;font-size:11px}
+.quick-sound-mix>summary{cursor:pointer;user-select:none;font-weight:800;color:#3b6260;padding:4px 0}
+.quick-sound-mix[open]{padding-bottom:10px}
+.mix-sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px}
+.mix-volume-control{display:flex;flex-direction:column;gap:5px;min-width:0;color:#455e63;font-size:12px}
+.mix-volume-heading{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.mix-volume-heading strong{font-size:12px}
+.mix-volume-heading output{font-size:12px;font-weight:850;color:#167a71;font-variant-numeric:tabular-nums}
+.mix-volume-control input[type=range]{width:100%;height:26px;accent-color:#159e91;cursor:pointer;touch-action:pan-y}
+.mix-volume-control small{font-size:10px;color:#75848d;line-height:1.3}
+.audio-mix-settings .mix-sliders{margin-top:14px}
+@media(max-width:650px){.highway-key .piano-mini-legend{width:100%;justify-content:flex-end}.mix-sliders{grid-template-columns:1fr}.audio-mix-settings .mix-sliders{grid-template-columns:1fr}}

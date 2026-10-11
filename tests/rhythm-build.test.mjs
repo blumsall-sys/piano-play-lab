@@ -9,11 +9,11 @@ test('rhythm UI controls are present and wired to code',()=>{
  }
  for(const module of ['rhythm','metronome','score-strip','progress-store']){
   assert.ok(existsSync(new URL(`../js/${module}.js`,import.meta.url)));
-  assert.match(main,new RegExp(`from './${module}\\.js\\?v=2\\.6'`));
+  assert.match(main,new RegExp(`from './${module}\\.js\\?v=2\\.7'`));
  }
 });
 test('document and source version are consistent',()=>{
- assert.match(page,/v2\.6 READY|v2\.6 · 20 lessons/);
- assert.match(page,/main\.js\?v=2\.6/);
- assert.match(page,/styles\.css\?v=2\.6/);
+ assert.match(page,/v2\.7 READY|v2\.7 · 20 lessons/);
+ assert.match(page,/main\.js\?v=2\.7/);
+ assert.match(page,/styles\.css\?v=2\.7/);
 });

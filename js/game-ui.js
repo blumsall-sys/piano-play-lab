@@ -89,7 +89,18 @@ export class GameUI{
     const play=create('section','game-page game-player',`<div class="player-topbar"><div><span class="overline">NOW PLAYING · <span id="player-lesson-number">LESSON 1</span></span><h2 id="player-lesson-title">Find the First F</h2></div><div class="player-actions"><span id="player-stars">☆ ☆ ☆</span><button class="btn btn-secondary" id="game-narrate">🔊 Hear Cleo's instructions</button><button class="btn btn-secondary" data-page="map">✕ Exit</button></div></div><div id="lesson-checkpoints" class="checkpoint-track" aria-label="Lesson checkpoints"></div><div class="highway-title"><div><span class="overline">RHYTHM HIGHWAY</span><p>Read ahead: notes travel toward the <b>PLAY</b> line.</p></div><div id="mode-switch" class="mode-switch" role="group" aria-label="Practice mode"><button type="button" data-mode="learn" aria-pressed="true">Learn · no timer</button><button type="button" data-mode="perform" aria-pressed="false">Perform · on beat</button></div></div>`);
     play.id='screen-play';
     const highwayBox=create('div','highway-box',`<canvas id="highway-canvas" height="180" aria-label="Scrolling rhythm highway displaying note names, chords, and durations"></canvas><div class="highway-key"><span class="dot gold"></span> Current <span class="dot blue"></span> Upcoming <span class="dot green"></span> Completed</div>`);
-    play.append(lesson,highwayBox,rhythm,piano);
+    // Rhythm controls ABOVE the notes; notes sit immediately above the piano.
+    play.append(lesson,rhythm,highwayBox,piano);
+    // Keep the key colour guide next to the highway's beat legend, not above the piano.
+    const redundantHeading=piano.querySelector('.section-heading');
+    const keyLegend=redundantHeading?.querySelector('.legend');
+    if(keyLegend){keyLegend.classList.add('piano-mini-legend');highwayBox.querySelector('.highway-key').append(keyLegend);}
+    redundantHeading?.remove();
+    const accessibleTitle=create('span','sr-only','Interactive piano keys');
+    accessibleTitle.id='piano-title';piano.prepend(accessibleTitle);
+    // Add quick volume adjustment without cluttering the key/timeline view.
+    const volumeDetails=create('details','quick-sound-mix',`<summary>🔊 Sound levels</summary><div class="mix-sliders" id="quick-mix-sliders"></div>`);
+    piano.querySelector('.controls-row').after(volumeDetails);
     // Narration is the first button in the main teaching row, not a distant header button.
     piano.querySelector('.controls-row').prepend(play.querySelector('#game-narrate'));
     const practiceConnect=create('button','btn btn-primary midi-practice-connect','🔌 Connect USB MIDI');
@@ -120,6 +131,8 @@ export class GameUI{
         <p class="subtle">For most of Cleo's lessons, the physical octave buttons should be at zero. If the keyboard plays the wrong octave, reset them by pressing both octave buttons together.</p>
       </div>`);
     settings.append(instrument);
+    const soundSettings=create('section','setting-card audio-mix-settings',`<span class="overline">SOUND BALANCE</span><h2>Keyboard & chime volumes</h2><p class="subtle">Make the MIDI piano easy to hear while keeping success chimes gentle. Both controls are also available under Sound levels when practicing.</p><div class="mix-sliders" id="settings-mix-sliders"></div>`);
+    settings.append(soundSettings);
     instrument.querySelector('.midi-connect-slot').append($('midi-button'));
     instrument.querySelector('#midi-status-slot').append($('midi-status'));
     for(const section of [guide,mic,calibration,chord,camera,how]){

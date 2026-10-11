@@ -1,6 +1,6 @@
 {
   "name": "cleos-piano-play-lab",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "private": true,
   "type": "module",
   "description": "Cleo's Piano Play Lab: 20 lessons, rhythm highway, step checkpoints, microphone and MIDI",

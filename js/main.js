@@ -1,20 +1,63 @@
-import {GameUI,restoreActive} from './game-ui.js?v=2.6';
-import {Keyboard} from './keyboard.js?v=2.6';
-import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.6';
-import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.6';
-import {LessonEngine,eventNotes} from './lesson.js?v=2.6';
-import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=2.6';
-import {soundNote,soundChime,soundCelebration,soundMelody,midiSoundOn,midiSoundOff,midiSoundAllOff,prepareMidiAudio} from './sound.js?v=2.6';
-import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=2.6';
-import {VoiceGuide} from './voice-guide.js?v=2.6';
-import {spectralNotes} from './chord-audio.js?v=2.6';
-import {RhythmSession,eventTimeline,lessonBeats} from './rhythm.js?v=2.6';
-import {Metronome} from './metronome.js?v=2.6';
-import {LoopPractice} from './loop-practice.js?v=2.6';
-import {buildScoreStrip} from './score-strip.js?v=2.6';
-import {loadHistory,saveSession,exportHistory,updateSessionRhythm} from './progress-store.js?v=2.6';
+import {GameUI,restoreActive} from './game-ui.js?v=2.7';
+import {Keyboard} from './keyboard.js?v=2.7';
+import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.7';
+import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.7';
+import {LessonEngine,eventNotes} from './lesson.js?v=2.7';
+import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=2.7';
+import {soundNote,soundChime,soundCelebration,soundMelody,midiSoundOn,midiSoundOff,midiSoundAllOff,prepareMidiAudio,setMidiVolume,setChimeVolume,getAudioMix,DEFAULT_MIDI_VOLUME,DEFAULT_CHIME_VOLUME} from './sound.js?v=2.7';
+import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=2.7';
+import {VoiceGuide} from './voice-guide.js?v=2.7';
+import {spectralNotes} from './chord-audio.js?v=2.7';
+import {RhythmSession,eventTimeline,lessonBeats} from './rhythm.js?v=2.7';
+import {Metronome} from './metronome.js?v=2.7';
+import {LoopPractice} from './loop-practice.js?v=2.7';
+import {buildScoreStrip} from './score-strip.js?v=2.7';
+import {loadHistory,saveSession,exportHistory,updateSessionRhythm} from './progress-store.js?v=2.7';
 
 const $=id=>document.getElementById(id);
+const AUDIO_MIX_STORAGE_KEY='cleos-piano-audio-mix-v2.7';
+function setupAudioMixUI(){
+  let stored={};
+  try{stored=JSON.parse(localStorage.getItem(AUDIO_MIX_STORAGE_KEY)||'{}')||{};}catch{}
+  setMidiVolume(Number.isFinite(Number(stored.midi))&&stored.midi!==undefined?stored.midi:DEFAULT_MIDI_VOLUME);
+  setChimeVolume(Number.isFinite(Number(stored.chime))&&stored.chime!==undefined?stored.chime:DEFAULT_CHIME_VOLUME);
+  const definitions=[
+    {key:'midi',title:'MIDI keyboard',id:'midi-volume',description:'Piano sound from the M-Audio controller'},
+    {key:'chime',title:'Correct-note chime',id:'chime-volume',description:'Success chimes and end-of-lesson celebration'}
+  ];
+  const controls=[];
+  for(const containerId of ['settings-mix-sliders','quick-mix-sliders']){
+    const container=$(containerId);
+    if(!container)continue;
+    for(const item of definitions){
+      const label=document.createElement('label');label.className='mix-volume-control';
+      const heading=document.createElement('span');heading.className='mix-volume-heading';
+      const name=document.createElement('strong');name.textContent=item.title;
+      const value=document.createElement('output');value.className='mix-volume-value';value.textContent='';
+      heading.append(name,value);
+      const slider=document.createElement('input');slider.type='range';slider.min='0';slider.max='100';slider.step='1';
+      slider.id=containerId==='settings-mix-sliders'?item.id:item.id+'-quick';
+      slider.setAttribute('aria-label',item.title+' volume');
+      const desc=document.createElement('small');desc.textContent=item.description;
+      label.append(heading,slider,desc);container.append(label);
+      controls.push({key:item.key,slider,value});
+      slider.addEventListener('input',()=>{
+        const normalized=Number(slider.value)/100;
+        if(item.key==='midi')setMidiVolume(normalized);else setChimeVolume(normalized);
+        for(const control of controls.filter(control=>control.key===item.key)){
+          control.slider.value=String(Math.round(normalized*100));control.value.textContent=Math.round(normalized*100)+'%';
+        }
+        try{localStorage.setItem(AUDIO_MIX_STORAGE_KEY,JSON.stringify(getAudioMix()));}catch{}
+      });
+    }
+  }
+  const mix=getAudioMix();
+  for(const item of controls){
+    const percent=Math.round(mix[item.key]*100);
+    item.slider.value=String(percent);item.value.textContent=percent+'%';
+  }
+}
+
 const elements={
   lesson:$('lesson-select'),title:$('lesson-title'),description:$('lesson-description'),target:$('target-note'),hint:$('target-hint'),
   heard:$('heard-note'),heardDetails:$('heard-details'),progress:$('progress-count'),stars:$('stars-text'),fill:$('progress-fill'),bar:$('progress-track'),feedback:$('feedback'),
@@ -1111,6 +1154,7 @@ async function boot(){
       onNarrate:()=>elements.voiceRead.click()
     });
     setupInstrumentUI();
+    setupAudioMixUI();
     const midiPractice=$('midi-practice-connect');
     if(midiPractice)midiPractice.addEventListener('click',connectMidi);
     const midiRescan=$('midi-rescan');
@@ -1122,7 +1166,7 @@ async function boot(){
       elements.lesson.append(option);
     });
     elements.lesson.value=engine.lesson.id;
-    elements.releaseStatus.textContent=`v2.6 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord lessons`;
+    elements.releaseStatus.textContent=`v2.7 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord lessons`;
     syncRhythmLesson();
     buildHistoryUI();
     render();

@@ -1,7 +1,7 @@
 // Application navigation, kid-friendly lesson map and three-checkpoint learning flow.
 // Audio, keyboard, score grading and MIDI remain in the v2.1 modules.
 import {loadHistory} from './progress-store.js';
-import {RhythmHighway} from './rhythm-highway.js';
+import {RhythmHighway} from './rhythm-highway.js?v=2.9';
 const KEY='cleos-piano-play-v2.2-settings';
 const ACTIVE_KEY='cleos-piano-play-v2.2-active';
 const PASS=70;
@@ -205,9 +205,9 @@ export class GameUI{
   onComplete(passedOverride=null){
     const state=this.engine.state(),passed=passedOverride===null?state.summary.accuracy>=PASS:passedOverride;
     $('result-stars').textContent=!passed?'☆☆☆':state.summary.accuracy>=95?'★★★':state.summary.accuracy>=80?'★★☆':'★☆☆';
-    this.results.querySelector('.result-heading h1').textContent=passed?'Wonderful playing, Cleo! ✨': 'Three tries complete, Cleo! Keep practicing!';
+    this.results.querySelector('.result-heading h1').textContent=passed?'Wonderful playing, Cleo! ✨': 'Three repetitions complete, Cleo! Keep practicing!';
     $('results-title').textContent=passed?'Congratulations! 🎉':'Your practice results';
-    $('result-pass-message').textContent=passed?'Lesson passed! The next adventure is unlocked.':passedOverride===false?'Three tries completed. No full in-time melody yet. Restart and try again!':'Nice effort! Try again to reach 70% accuracy and unlock the next lesson.';
+    $('result-pass-message').textContent=passed?'Lesson passed! The next adventure is unlocked.':passedOverride===false?'Three repetitions completed. Keep practicing to improve!':'Nice effort! Try again to reach 70% accuracy and unlock the next lesson.';
     $('result-next').disabled=!passed||!state.nextLessonId;
     this.updateMap();this.show('results');
   }
@@ -224,7 +224,8 @@ export class GameUI{
     }
     const done=state.position,steps=checkpoints(state);
     $('lesson-checkpoints').innerHTML=steps.map((s,i)=>`<div class="checkpoint ${s.done?'complete':(done>=s.start?'active':'')}"><span class="checkpoint-icon">${s.done?'✓':i+1}</span><span>Step ${i+1}<b>${s.label}</b></span></div>`).join('');
-    $('player-stars').textContent=state.done?'★ ★ ★':`${state.position} / ${state.length} notes`;
+    const loop=this.getSession()?.loopPractice;
+    $('player-stars').textContent=loop?`Repetition ${loop.passIndex+1} / ${loop.passes} · ${state.position}/${state.length}`:(state.done?'★ ★ ★':`${state.position} / ${state.length} notes`);
     this.updateHome();
   }
   updateHome(){
@@ -238,7 +239,7 @@ export class GameUI{
     const grid=$('lesson-map');grid.replaceChildren();
     this.engine.lessons.forEach((l,i)=>{
       const best=Math.max(0,...h.filter(x=>x.lessonId===l.id).map(x=>x.keyAccuracy||0));
-      const passed=best>=PASS,locked=i>=allowed;
+      const passed=best>=PASS&&h.some(s=>s.lessonId===l.id&&s.loopPassed!==false),locked=i>=allowed;
       const n=create('button',`map-card ${passed?'passed':''} ${locked?'locked':''}`,
         `<span class="map-index">${locked?'🔒':passed?'✓':String(i+1).padStart(2,'0')}</span><span class="map-type">${l.category==='hands'?'TWO HANDS':l.category==='theory'?'MUSIC THEORY':l.category==='rhythm'?'RHYTHM':l.notes.some(Array.isArray)?'CHORDS':i<4?'STARTER':'MELODY'}</span><strong>${html(l.title)}</strong><small>${passed?`★ ${Math.round(best)}% best`:locked?'Finish the earlier lesson to unlock':`${l.notes.length} musical steps`}</small><span class="map-play">${locked?'Locked':'Play →'}</span>`);
       n.disabled=locked;n.addEventListener('click',()=>this.selectLesson(i));grid.append(n);

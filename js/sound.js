@@ -136,3 +136,11 @@ export function midiSoundOff(note){
   }
 }
 export function midiSoundAllOff(){for(const note of [...midiVoices.keys()])midiSoundOff(note);}
+
+// Short, gentle optional tick for the four-beat practice break in untimed Learn Mode.
+// Not routed through the note/chime gain, so the chime-volume slider stays independent.
+export async function soundRestTick(accent=false){
+  await ensureContext();
+  const at=ctx.currentTime;
+  playTone(accent?1120:850,{when:at,duration:.025,release:.018,attack:.003,volume:.025,type:'sine'});
+}

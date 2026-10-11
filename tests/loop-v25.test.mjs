@@ -17,14 +17,14 @@ test('25-key F3–F5 song repeats three times with exactly four rest beats',()=>
  assert.equal(loop.startBeat(2)-loop.endBeat(1),4);
  assert.equal(loop.totalBeats(),3*5+8);
 });
-test('successful complete first attempt ends the challenge early',()=>{
+test('successful complete first attempt still requires all three repetitions',()=>{
  const {engine,loop,session}=setup();
  for(let i=0;i<5;i++){
   assert.equal(loop.isAllowed(engine.position,i),true);
   engine.accept(53);session.observe(i,session.anchorMs+i*session.timeline.beatMs,'midi');
  }
  const transition=loop.advance(5,engine,session);
- assert.equal(transition.finished,true);assert.equal(loop.passed,true);
+ assert.equal(transition.finished,false);assert.equal(loop.phase,'rest');assert.equal(loop.passed,true);
  assert.equal(loop.report().attempts.length,1);
  assert.equal(loop.report().attempts[0].missed,0);
 });

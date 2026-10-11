@@ -3,11 +3,11 @@
 import {eventTimeline} from './rhythm.js';
 
 export class LoopPractice {
-  constructor(lesson,bpm,speed,{passes=3,restBeats=4,needOnTime=false}={}){
+  constructor(lesson,bpm,speed,{passes=3,restBeats=4,needOnTime=false,guided=false,requireAllPasses=true}={}){
     if(!Number.isInteger(passes)||passes<1||passes>9)throw Error('Invalid number of passes');
     if(!Number.isInteger(restBeats)||restBeats<0||restBeats>16)throw Error('Invalid rest duration');
     this.timeline=eventTimeline(lesson,bpm,speed);
-    this.passes=passes;this.restBeats=restBeats;this.needOnTime=needOnTime;
+    this.passes=passes;this.restBeats=restBeats;this.needOnTime=needOnTime;this.guided=guided;this.requireAllPasses=requireAllPasses;
     this.passIndex=0;this.phase='playing';this.results=[];this.finished=false;this.passed=false;
     this.completionReason='';this.best=null;
   }
@@ -36,9 +36,11 @@ export class LoopPractice {
     this.results.push(result);
     if(!this.best||result.accuracy>this.best.accuracy ||
        (result.accuracy===this.best.accuracy&&result.missed<this.best.missed))this.best={...result};
-    if(pass){this.passed=true;this.finished=true;this.phase='finished';this.completionReason='success';}
-    else if(this.passIndex===this.passes-1){this.finished=true;this.phase='finished';this.completionReason='out-of-tries';}
-    else this.phase='rest';
+    if(pass)this.passed=true;
+    if(this.passIndex===this.passes-1 || (pass&&!this.requireAllPasses)){
+      this.finished=true;this.phase='finished';
+      this.completionReason=this.passed?'completed':'out-of-tries';
+    }else this.phase='rest';
     return result;
   }
   // Called frequently, including on missed notes. Emits transitions so the UI can react.
@@ -66,5 +68,23 @@ export class LoopPractice {
     if(this.phase==='rest')transition.restRemaining=this.restBeats;
     return transition;
   }
-  report(){return {passes:this.passes,attempts:this.results,passed:this.passed,best:this.best,finished:this.finished,reason:this.completionReason};}
+  // Untimed Learn Mode: one pass ends on its final correct note, followed by a timed four-beat rest.
+  completeGuidedPass(engine){
+    if(!this.guided||this.phase!=='playing'||!engine.state().done)return null;
+    return this.recordPass(engine,null);
+  }
+  resumeGuidedPass(engine){
+    if(!this.guided||this.phase!=='rest'||this.finished)return false;
+    this.passIndex++;
+    engine.restart();
+    this.phase='playing';
+    return true;
+  }
+  report(){
+    const totals=this.results.reduce((sum,r)=>({expectedPresses:sum.expectedPresses+r.expected,attempts:sum.attempts+r.attempts,
+      correctPresses:sum.correctPresses+r.correct,wrongPresses:sum.wrongPresses+r.wrong,missedNotes:sum.missedNotes+r.missed}),
+      {expectedPresses:0,attempts:0,correctPresses:0,wrongPresses:0,missedNotes:0});
+    const accuracy=totals.attempts+totals.missedNotes?totals.correctPresses/(totals.attempts+totals.missedNotes)*100:0;
+    return {passes:this.passes,attempts:this.results,passed:this.passed,best:this.best,finished:this.finished,reason:this.completionReason,totals:{...totals,accuracy}};
+  }
 }

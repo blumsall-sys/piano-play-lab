@@ -1,14 +1,16 @@
-# Cleo's Piano Play Lab v2.8 — 50-Lesson Curriculum
+# Cleo's Piano Play Lab v2.9 — Three Repetitions for All 50 Lessons
 
 A free, self-hosted music-learning game. This update **retains the first 20 lessons** and adds 30 beginner lessons covering finger positions, left/right-hand coordination, theory, rhythm, familiar public-domain songs and easy chords.
 
-**New:** Lessons are now loaded from **`lessons/lessons.json` first**, instead of relying exclusively on the copy embedded in `index.html`. Once you deploy v2.8, adding lessons using the existing schema requires updating only `lessons/lessons.json` on GitHub. No recompilation or additional deployment configuration is required. The embedded 50-lesson catalog is a last-known-good backup if the JSON fails to load.
+**Repeat fix v2.9:** Every lesson now practices three complete repetitions by default, including in untimed Learn Mode. There is a four-beat rest between repetitions and results are shown only after the third. Perform Mode also completes all three even if the first is successful. This is an application logic change, not a `lessons.json` edit. Turn off **3 repetitions** only if you intentionally want single-pass testing.
+
+**Curriculum v2.8:** Lessons are now loaded from **`lessons/lessons.json` first**, instead of relying exclusively on the copy embedded in `index.html`. Once you deploy v2.9, adding lessons using the existing schema requires updating only `lessons/lessons.json` on GitHub. No recompilation or additional deployment configuration is required. The embedded 50-lesson catalog is a last-known-good backup if the JSON fails to load.
 
 ## Quick start — Windows
 1. Extract the ZIP. Open the `Cleos_Piano_Play_Lab` folder.
 2. Run `START_WINDOWS.bat`. Keep the server console open.
 3. Open `http://localhost:8000/?build=280` in Chrome or Edge.
-4. Confirm the status says `v2.8 READY · 50 lessons ... lessons.json`.
+4. Confirm the status says `v2.9 READY · 50 lessons ... lessons.json`.
 5. Open **Lessons**. You should see 50 cards. To try Lessons 21–50 immediately, go to **Settings → Unlock all lessons for testing**.
 6. To test your physical Hape piano, select Hape, start the microphone, and allow browser access. For M-Audio, select the M-Audio layout and connect via USB MIDI.
 

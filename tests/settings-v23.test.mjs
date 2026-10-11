@@ -11,7 +11,7 @@ test('Settings contains independently accessible live microphone and resume butt
  assert.match(main,/settingsMicState\.textContent=/);
 });
 test('Settings navigation preserves active mic and excludes settings pitches from scoring',()=>{
- assert.match(main,/onNavigate:\(\)=>\{stopRhythm/);
+ assert.match(main,/onNavigate:\(\)=>\{\s*if\(rhythmSession\)stopRhythm/);
  assert.doesNotMatch(main,/onNavigate:[^\n]*microphone\.stop/);
  assert.match(main,/function scoringAllowed\(\)/);
  assert.match(main,/if\(!engine\|\|!scoringAllowed\(\)\)return;/);

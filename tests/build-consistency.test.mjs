@@ -29,10 +29,10 @@ test('melody controls are visible and functional in the shipped page',()=>{
   assert.match(main,/melodyButton\.addEventListener\('click',hearWholeMelody\)/);
   assert.match(main,/melodyStop\.addEventListener\('click'/);
 });
-test('version labels and cache busters all identify 2.8',()=>{
-  assert.match(html,/CLEO EDITION · v2\.8/);
-  assert.match(html, /main\.js\?v=2\.8/);
-  assert.match(html,/styles\.css\?v=2\.8/);
+test('version labels and cache busters all identify 2.9',()=>{
+  assert.match(html,/CLEO EDITION · v2\.9/);
+  assert.match(html, /main\.js\?v=2\.9/);
+  assert.match(html,/styles\.css\?v=2\.9/);
   assert.doesNotMatch(main, /v=1\.8\.1/);
   assert.match(main,/embedded-lessons/);
 });

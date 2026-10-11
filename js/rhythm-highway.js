@@ -31,7 +31,12 @@ export class RhythmHighway {
     const session=this.getSession(),{bpm,speed}=this.getTempo();
     let timeline;
     try{timeline=session?.timeline||eventTimeline(state.lesson,bpm,speed);}catch{return;}
-    const currentBeat=highwayPosition({timeline,position:state.position,anchorMs:session?.anchorMs??null,nowMs:performance.now()});
+    const loop=session?.loopPractice;
+    // Untimed Learn Mode still displays the active repetition and its rest bar.
+    const guidedRelative=loop?.guided ? (loop.phase==='rest' ? loop.timeline.totalBeats :
+      (timeline.events[Math.min(state.position,timeline.events.length-1)]?.startBeat??timeline.totalBeats)) : null;
+    const currentBeat=loop?.guided ? loop.startBeat()+guidedRelative :
+      highwayPosition({timeline,position:state.position,anchorMs:session?.anchorMs??null,nowMs:performance.now()});
     const pixelsPerBeat=Math.max(90,Math.min(142,width/5.8));
     const hitX=Math.min(224,width*.24),y0=34,blockY=55,blockH=height-73;
     // Beat grid follows the musical clock; only the key names move along the highway.
@@ -43,7 +48,6 @@ export class RhythmHighway {
       ctx.beginPath();ctx.moveTo(x,23);ctx.lineTo(x,height-12);ctx.stroke();
       ctx.fillStyle=beat%4===0?'#adc7e0':'#587392';ctx.font='11px system-ui';ctx.fillText(`BEAT ${beat+1}`,x+5,20);
     }
-    const loop=session?.loopPractice;
     // Render successive complete copies of the score on one continuous clock.
     // The four-beat empty measures are visible between runs.
     const passes=loop?.passes??1;

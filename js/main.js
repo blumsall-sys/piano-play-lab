@@ -1,19 +1,19 @@
-import {GameUI,restoreActive} from './game-ui.js?v=2.8';
-import {Keyboard} from './keyboard.js?v=2.8';
-import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.8';
-import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.8';
-import {LessonEngine,eventNotes} from './lesson.js?v=2.8';
-import {loadLessonCatalog} from './catalog-loader.js?v=2.8';
-import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=2.8';
-import {soundNote,soundChime,soundCelebration,soundMelody,midiSoundOn,midiSoundOff,midiSoundAllOff,prepareMidiAudio,setMidiVolume,setChimeVolume,getAudioMix,DEFAULT_MIDI_VOLUME,DEFAULT_CHIME_VOLUME} from './sound.js?v=2.8';
-import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=2.8';
-import {VoiceGuide} from './voice-guide.js?v=2.8';
-import {spectralNotes} from './chord-audio.js?v=2.8';
-import {RhythmSession,eventTimeline,lessonBeats} from './rhythm.js?v=2.8';
-import {Metronome} from './metronome.js?v=2.8';
-import {LoopPractice} from './loop-practice.js?v=2.8';
-import {buildScoreStrip} from './score-strip.js?v=2.8';
-import {loadHistory,saveSession,exportHistory,updateSessionRhythm} from './progress-store.js?v=2.8';
+import {GameUI,restoreActive} from './game-ui.js?v=2.9';
+import {Keyboard} from './keyboard.js?v=2.9';
+import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.9';
+import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.9';
+import {LessonEngine,eventNotes} from './lesson.js?v=2.9';
+import {loadLessonCatalog} from './catalog-loader.js?v=2.9';
+import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=2.9';
+import {soundNote,soundChime,soundCelebration,soundMelody,midiSoundOn,midiSoundOff,midiSoundAllOff,prepareMidiAudio,setMidiVolume,setChimeVolume,getAudioMix,DEFAULT_MIDI_VOLUME,DEFAULT_CHIME_VOLUME,soundRestTick} from './sound.js?v=2.9';
+import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=2.9';
+import {VoiceGuide} from './voice-guide.js?v=2.9';
+import {spectralNotes} from './chord-audio.js?v=2.9';
+import {RhythmSession,eventTimeline,lessonBeats} from './rhythm.js?v=2.9';
+import {Metronome} from './metronome.js?v=2.9';
+import {LoopPractice} from './loop-practice.js?v=2.9';
+import {buildScoreStrip} from './score-strip.js?v=2.9';
+import {loadHistory,saveSession,exportHistory,updateSessionRhythm} from './progress-store.js?v=2.9';
 
 const $=id=>document.getElementById(id);
 const AUDIO_MIX_STORAGE_KEY='cleos-piano-audio-mix-v2.7';
@@ -193,6 +193,8 @@ let metronome=null;
 let loopPractice=null;
 let loopTimer=null;
 let loopPassOverride=null;
+let guidedRestTimer=null;
+let guidedRestEnd=0;
 let completedSaved=false;
 let attemptLog=[];
 let currentSessionId='';
@@ -229,10 +231,77 @@ function selectedMultiplier(){return Number(elements.rhythmSpeed.value)||1;}
 function updateTempoHUD(){
   elements.rhythmTempo.textContent=`${Math.round(selectedBpm()*selectedMultiplier()*10)/10} BPM (${selectedBpm()} × ${selectedMultiplier()})`;
 }
+// Learn Mode repeats the same 50-lesson score three times without imposing a note deadline.
+// The only timed part is the four-beat breathing space between complete repetitions.
+function cancelGuidedRest(){
+  if(guidedRestTimer!==null){clearInterval(guidedRestTimer);guidedRestTimer=null;}
+  guidedRestEnd=0;
+}
+function createGuidedLoop({keepPosition=false}={}){
+  cancelGuidedRest();
+  if(!engine||!elements.rhythmLoop.checked||gameUI?.mode==='perform')return;
+  if(!keepPosition)engine.restart();
+  loopPassOverride=null;
+  loopPractice=new LoopPractice(engine.lesson,selectedBpm(),selectedMultiplier(),
+    {passes:3,restBeats:4,guided:true,requireAllPasses:true});
+  elements.rhythmLoopStatus.textContent='Repetition 1 / 3 · learn at your pace';
+  elements.rhythmBeat.textContent='Learn Mode · no timer';
+  elements.rhythmFeedback.textContent='Play the full line three times. A four-beat rest follows each repetition.';
+}
+function pauseGuidedRest(){if(guidedRestTimer!==null){clearInterval(guidedRestTimer);guidedRestTimer=null;}}
+function startGuidedRest(){
+  if(!loopPractice?.guided||loopPractice.phase!=='rest'||loopPractice.finished)return;
+  cancelGuidedRest();
+  const beatMs=loopPractice.timeline.beatMs;
+  const totalMs=loopPractice.restBeats*beatMs;
+  const pass=loopPractice.passIndex+1;
+  guidedRestEnd=performance.now()+totalMs;
+  let lastTick=-1;
+  const step=()=>{
+    if(!loopPractice?.guided||loopPractice.phase!=='rest'||gameUI?.mode==='perform') {cancelGuidedRest();return;}
+    const remainingMs=Math.max(0,guidedRestEnd-performance.now());
+    const elapsedBeats=Math.min(loopPractice.restBeats,Math.floor((totalMs-remainingMs)/beatMs));
+    if(elapsedBeats!==lastTick&&remainingMs>0){
+      lastTick=elapsedBeats;
+      if(elements.metronomeAudible.checked)void soundRestTick(elapsedBeats===0).catch(()=>{});
+    }
+    const remaining=Math.max(0,Math.ceil(remainingMs/beatMs));
+    elements.rhythmBeat.textContent=`Rest · ${remaining} / 4 beats`;
+    elements.rhythmLoopStatus.textContent=`Repetition ${pass} complete · next ${pass+1}/3`;
+    elements.rhythmFeedback.textContent=`Take a breath. Repetition ${pass+1} begins in ${remaining} beat${remaining===1?'':'s'}.`;
+    if(remainingMs>0)return;
+    cancelGuidedRest();
+    if(loopPractice.resumeGuidedPass(engine)){
+      clearMicLatch();midiChordHolds.clear();keyboard.setDetected(null);
+      render();
+      elements.rhythmBeat.textContent='Learn Mode · play when ready';
+      elements.rhythmLoopStatus.textContent=`Repetition ${loopPractice.passIndex+1} / 3`;
+      status(`Repetition ${loopPractice.passIndex+1} of 3! Try the same notes again.`,'success');
+    }
+  };
+  step();
+  guidedRestTimer=setInterval(step,60);
+}
+function handleGuidedPassCompletion(){
+  if(!loopPractice?.guided||!engine.state().done||loopPractice.phase!=='playing')return;
+  const result=loopPractice.completeGuidedPass(engine);
+  if(!result)return;
+  elements.rhythmFeedback.textContent=`Repetition ${result.pass} / 3 · ${Math.round(result.accuracy)}% note accuracy`;
+  if(loopPractice.finished){
+    loopPassOverride=loopPractice.passed;
+    elements.rhythmLoopStatus.textContent=`All 3 repetitions complete · ${loopPractice.passed?'Passed!':'Keep practicing'}`;
+    elements.rhythmBeat.textContent='Finished · 3 / 3 repetitions';
+    if(loopPractice.passed)void soundCelebration().catch(()=>{});
+  }else {
+    keyboard.setTarget(null);
+    startGuidedRest();
+  }
+}
 function stopRhythm({message=true}={}){
+  cancelGuidedRest();
   if(loopTimer!==null){clearInterval(loopTimer);loopTimer=null;}
   metronome?.stop();metronome=null;rhythmSession=null;loopPractice=null;
-  elements.rhythmLoopStatus.textContent=elements.rhythmLoop.checked?'3 tries · 1 bar between':'Repeat challenge off';
+  elements.rhythmLoopStatus.textContent=elements.rhythmLoop.checked?'3 repetitions · 1 bar between':'Repeat challenge off';
   elements.rhythmStart.disabled=false;elements.rhythmStop.disabled=true;
   elements.rhythmBeat.textContent='Beat stopped';
   elements.scoreStrip?.querySelectorAll('.beat-now').forEach(n=>n.classList.remove('beat-now'));
@@ -282,8 +351,8 @@ function updateLoopPractice(){
   if(change.finished){
     if(loopTimer!==null){clearInterval(loopTimer);loopTimer=null;}
     loopPassOverride=loopPractice.passed;
-    elements.rhythmLoopStatus.textContent=loopPractice.passed?`Passed on try ${loopPractice.results.length}!`:'3 tries completed · Keep practicing';
-    if(loopPractice.passed){status('Wonderful playing! You completed the melody in time!','success');suppressUntil=Date.now()+1200;void soundCelebration().catch(console.warn);}
+    elements.rhythmLoopStatus.textContent=loopPractice.passed?'All 3 repetitions complete · Passed!':'All 3 repetitions complete · Keep practicing';
+    if(loopPractice.passed){status('Well done! You have practiced the melody three times!','success');suppressUntil=Date.now()+1200;void soundCelebration().catch(console.warn);}
     else status('Three tries completed. See your results, then try the lesson again.','try-again');
     metronome?.stop();metronome=null;
     elements.rhythmStart.disabled=false;elements.rhythmStop.disabled=true;
@@ -294,7 +363,8 @@ function updateLoopPractice(){
 }
 
 async function startRhythm(){
-  if(!engine||engine.state().done)return;
+  if(!engine)return;
+  if(engine.state().done)engine.restart();
   if(voice?.isSpeaking)stopVoice();
   stopMelodyPreview({quiet:true});
   stopRhythm({message:false});
@@ -318,7 +388,7 @@ async function startRhythm(){
       loopTimer=setInterval(updateLoopPractice,30);
     }
     elements.rhythmStart.disabled=true;elements.rhythmStop.disabled=false;
-    elements.rhythmFeedback.textContent=loopPractice?'Three tries begin after the count-in. A four-beat rest separates each try.':elements.rhythmGrade.checked?'Listen for four beats, then play in time!':'Metronome-only practice. Timing grades are off.';
+    elements.rhythmFeedback.textContent=loopPractice?'Three complete repetitions begin after the count-in. A four-beat rest separates each repetition.':elements.rhythmGrade.checked?'Listen for four beats, then play in time!':'Metronome-only practice. Timing grades are off.';
     status('Four-beat count-in started. Listen, then play the score from left to right.');
   }catch(error){tick.stop();stopRhythm({message:false});status(`Could not start beat: ${error.message}`,'try-again');}
 }
@@ -327,6 +397,7 @@ function changeRhythmSettings(){
   try{localStorage.setItem('pianoplay-tempos-v2.1',JSON.stringify(Object.fromEntries(speedForLesson)));}catch{}
   updateTempoHUD();
   if(rhythmSession){stopRhythm();status('Tempo changed. Tap Start with 4-beat count-in to restart the timeline.');}
+  else if(loopPractice?.guided){loopPractice.timeline=eventTimeline(engine.lesson,selectedBpm(),selectedMultiplier());if(loopPractice.phase==='rest')startGuidedRest();}
 }
 function syncRhythmLesson(){
   stopRhythm({message:false});
@@ -336,6 +407,8 @@ function syncRhythmLesson(){
   updateTempoHUD();
   elements.rhythmFeedback.textContent='Preview the upcoming notes, then start the beat when ready.';
   refreshScore();
+  // This must initialize BEFORE the first render, not after entering Practice.
+  if(gameUI?.mode==='learn'&&elements.rhythmLoop.checked)createGuidedLoop({keepPosition:engine.position>0});
 }
 function refreshScore(){
   if(!engine)return;
@@ -386,10 +459,11 @@ function saveCompleted(){
   completedSaved=true;
   const {summary,lesson}=engine.state();
   const best=loopPractice?.best;
+  const totals=loopPractice?.finished?loopPractice.report().totals:null;
   const report=best?rhythmSession?.reportPass(best.pass-1)??null:rhythmSession?.report()??null;
   const record={id:crypto?.randomUUID?.()??`${Date.now()}-${Math.random()}`,lessonId:lesson.id,title:lesson.title,
-    finishedAt:new Date().toISOString(),keyAccuracy:best?.accuracy??summary.accuracy,correct:best?.correct??summary.correctPresses,attempts:best?.attempts??summary.attempts,
-    expected:summary.expectedPresses,wrong:best?.wrong??summary.wrongPresses,
+    finishedAt:new Date().toISOString(),keyAccuracy:best?.accuracy??summary.accuracy,overallAccuracy:totals?.accuracy??summary.accuracy,correct:totals?.correctPresses??summary.correctPresses,attempts:totals?.attempts??summary.attempts,
+    expected:totals?.expectedPresses??summary.expectedPresses,wrong:totals?.wrongPresses??summary.wrongPresses,
     rhythm:elements.rhythmGrade.checked?report:null,tempo:rhythmSession?.timeline.effectiveBpm??null,attemptLog,
     loopChallenge:loopPractice?.report()??null,loopPassed:loopPassOverride,
     // Progress is gated by loopPassed; the actual best score remains truthful.
@@ -529,13 +603,13 @@ function hideResults(){elements.results.hidden=true;}
 function showResults(){
   const {summary,nextLessonId}=engine.state();
   const best=loopPractice?.best;
-  const display=best?{...summary,accuracy:best.accuracy,attempts:best.attempts,correctPresses:best.correct,wrongPresses:best.wrong}:summary;
+  const display=loopPractice?.finished?loopPractice.report().totals:summary;
   const accuracy=Math.round(display.accuracy*10)/10;
   elements.resultAccuracy.textContent=`${accuracy}%`;
   elements.resultAttempts.textContent=String(display.attempts);
-  elements.resultIdeal.textContent=String(summary.expectedPresses);
+  elements.resultIdeal.textContent=String(display.expectedPresses);
   elements.resultWrong.textContent=String(display.wrongPresses);
-  elements.resultScoreCaption.textContent=loopPractice?'Best of your three tries · missed notes count':summary.perfect?'Perfect playing! Every key press was right.':'Correct detected keys ÷ all key attempts (not rhythm accuracy)';
+  elements.resultScoreCaption.textContent=loopPractice?'All 3 repetitions combined · best repetition determines lesson pass':summary.perfect?'Perfect playing! Every key press was right.':'Correct detected keys ÷ all key attempts (not rhythm accuracy)';
   const report=loopPractice?.best?rhythmSession?.reportPass(loopPractice.best.pass-1):rhythmSession?.report();
   elements.resultTiming.textContent=elements.rhythmGrade.checked&&report?.assessed?`${report.onTime} / ${report.assessed}`:'Not graded';
   elements.resultHolds.textContent=elements.rhythmGrade.checked&&report?.holdsMeasured?`${report.holdsGood} / ${report.holdsMeasured}`:'Not measured';
@@ -544,11 +618,11 @@ function showResults(){
     const report=loopPractice.report();
     loopResults.hidden=false;
     loopResults.replaceChildren();
-    const title=document.createElement('h3');title.textContent=`Rhythm Highway · ${loopPractice.results.length} of 3 tries`;
+    const title=document.createElement('h3');title.textContent=`Three full repetitions · ${loopPractice.results.length} of 3 complete`;
     loopResults.append(title);
     for(const pass of loopPractice.results){
       const item=document.createElement('div');item.className=`loop-result-row ${pass.passed?'passed':''}`;
-      item.textContent=`Try ${pass.pass} · ${Math.round(pass.accuracy)}% key accuracy · ${pass.missed} missed · ${pass.onTime}/${pass.assessed} on beat${pass.passed?' · PASSED ✓':''}`;
+      item.textContent=`Repetition ${pass.pass} · ${Math.round(pass.accuracy)}% key accuracy · ${pass.missed} missed · ${pass.onTime}/${pass.assessed} on beat${pass.passed?' · PASSED ✓':''}`;
       loopResults.append(item);
     }
   }else loopResults.hidden=true;
@@ -581,9 +655,11 @@ function render(){
   elements.description.textContent=lesson.description;
   elements.target.textContent=done?'★':noteList(target);
   elements.hint.textContent=done?'You finished the lesson!':(position===0?lesson.hint:(chord?'Find every golden key':'Find the highlighted golden key'));
-  elements.progress.textContent=`${position} / ${length}`;
+  const guidedCompleted=loopPractice?.guided?loopPractice.passIndex*length:0;
+  const shownLength=loopPractice?.guided?loopPractice.passes*length:length;
+  elements.progress.textContent=`${guidedCompleted+position} / ${shownLength}`;
   elements.stars.textContent=done?`${Math.round(summary.accuracy)}% accuracy`:`${Math.round(position/length*100)}% complete`;
-  const percent=position/length*100;
+  const percent=(guidedCompleted+position)/shownLength*100;
   elements.fill.style.width=percent+'%';
   elements.bar.setAttribute('aria-valuenow',String(percent));
   keyboard.setTarget(done?null:target);
@@ -597,7 +673,7 @@ function render(){
   refreshScore();
   elements.demo.disabled=done;
   if(done&&loopPractice&&!loopPractice.finished){
-    elements.hint.textContent='Great! Stay ready for the next beat or try.';
+    elements.hint.textContent=loopPractice.guided?'Great! Take a one-bar break, then play it again.':'Great! Stay ready for the next beat or repetition.';
   }else if(done){
     status('You did it! 🌟 Review your score below, restart this lesson, or move to the next one.','success');
     showResults();
@@ -618,6 +694,7 @@ async function submitNote(midi,source,press={}){
   if((source==='mic'||source==='midi')&&(previewActive||voice?.isSpeaking||Date.now()<suppressUntil||pendingCalibration))return;
   if(source==='mic'&&Date.now()-lastMidiAt<1300)return;
   if(engine.state().done)return;
+  if(loopPractice?.guided&&loopPractice.phase!=='playing'){status('Enjoy the one-bar rest before the next repetition.');return;}
   if(loopPractice&&rhythmSession?.anchorMs){
     const beat=(performance.now()-rhythmSession.anchorMs)/rhythmSession.timeline.beatMs;
     if(!loopPractice.isAllowed(engine.position,beat)){if(loopPractice.phase==='rest')status('Enjoy the four-beat break. Your next try is coming!');return;}
@@ -639,6 +716,7 @@ async function submitNote(midi,source,press={}){
   if(result.correct){
     if(result.eventComplete){
       await handleCorrectFeedback(result.done&&!loopPractice);
+      if(result.done)handleGuidedPassCompletion();
       render();
       if(!result.done){
         status(`Great! ${noteList(before.target)} complete. Next: ${noteList(result.target)}.`,'success');
@@ -655,6 +733,7 @@ async function submitNote(midi,source,press={}){
 }
 async function submitMidiChord(notes,onsetMs=performance.now()){
  if(selectedLayout!==MAUDIO||!engine||!scoringAllowed()||previewActive||voice?.isSpeaking||Date.now()<suppressUntil||pendingCalibration)return;
+ if(loopPractice?.guided&&loopPractice.phase!=='playing')return;
  if(rhythmSession?.isCountingIn(performance.now()))return;
  if(loopPractice&&rhythmSession?.anchorMs&&!loopPractice.isAllowed(engine.position,(performance.now()-rhythmSession.anchorMs)/rhythmSession.timeline.beatMs))return;
  const before=engine.state();
@@ -662,11 +741,12 @@ async function submitMidiChord(notes,onsetMs=performance.now()){
  const grade=result?.eventComplete?timingForStep(before.position,onsetMs,'midi'):null;
  for(const n of notes)recordAttempt(n,'midi',before.position,true,onsetMs,grade);
  keyboard.setDetected(notes);notes.forEach(n=>keyboard.pulse(n));
- if(result?.eventComplete){await handleCorrectFeedback(result.done&&!loopPractice);render();if(!result.done)status(`Excellent chord! Next: ${noteList(result.target)}.`,'success');}
+ if(result?.eventComplete){await handleCorrectFeedback(result.done&&!loopPractice);if(result.done)handleGuidedPassCompletion();render();if(!result.done)status(`Excellent chord! Next: ${noteList(result.target)}.`,'success');}
 }
 async function submitMicChord(notes){
   if(selectedLayout===MAUDIO||!engine||!scoringAllowed()||!chordLesson()||elements.chordMode.value!=='together')return;
   if(previewActive||voice?.isSpeaking||Date.now()<suppressUntil||pendingCalibration||Date.now()-lastMidiAt<1300)return;
+  if(loopPractice?.guided&&loopPractice.phase!=='playing')return;
   const expected=eventNotes(engine.target);
   const distinct=[...new Set(notes)].sort((a,b)=>a-b);
   if(expected.length!==distinct.length||!expected.every(x=>distinct.includes(x))){
@@ -682,7 +762,7 @@ async function submitMicChord(notes){
   const compensated=onset-Math.min(450,Math.max(0,Number(elements.micTimingOffset.value)||0));
   const grade=result.eventComplete?timingForStep(before.position,compensated,'mic-together'):null;
   expected.forEach(n=>{recordAttempt(n,'mic-together',before.position,true,onset,grade);keyboard.pulse(n);});
-  if(result?.eventComplete){await handleCorrectFeedback(result.done&&!loopPractice);render();if(!result.done)status(`Great chord! Next: ${noteList(result.target)}.`,'success');}
+  if(result?.eventComplete){await handleCorrectFeedback(result.done&&!loopPractice);if(result.done)handleGuidedPassCompletion();render();if(!result.done)status(`Great chord! Next: ${noteList(result.target)}.`,'success');}
 }
 async function playOnScreen(midi,press={}){
   stopMelodyPreview();
@@ -1134,11 +1214,18 @@ async function boot(){
       engine,
       chooseLesson:id=>{elements.lesson.value=id;elements.lesson.dispatchEvent(new Event('change',{bubbles:true}));},
       onModeChange:mode=>{
-        if(rhythmSession)stopRhythm({message:false});
+        stopRhythm({message:false});
+        engine.restart();
+        if(mode==='learn'&&elements.rhythmLoop.checked)createGuidedLoop();
+        render();
         elements.rhythmGrade.checked=mode==='perform';
         elements.rhythmFeedback.textContent=mode==='perform'?'Press Start with 4-beat count-in. Play when notes reach the line.':'Learn mode: take your time, the highway waits for you.';
       },
-      onNavigate:()=>{stopRhythm({message:false});stopMelodyPreview({quiet:true});stopVoice();},
+      onNavigate:()=>{
+        if(rhythmSession)stopRhythm({message:false});
+        else pauseGuidedRest();
+        stopMelodyPreview({quiet:true});stopVoice();
+      },
       onPageChange:name=>{
         if(name==='settings'){
           // Keep the mic running across navigation; disable experimental chord detection
@@ -1147,10 +1234,14 @@ async function boot(){
           updateMicButton();updateCalibrationUI();
         } else {
           if(pendingCalibration)cancelCapture('Settings closed. Calibration was cancelled.');
-          if(name==='play')setChordMode();
+          if(name==='play'){
+            setChordMode();
+            if(gameUI?.mode==='learn'&&elements.rhythmLoop.checked&&!loopPractice?.guided&&!engine.state().done)createGuidedLoop({keepPosition:true});
+            if(loopPractice?.guided&&loopPractice.phase==='rest'&&guidedRestTimer===null)startGuidedRest();
+          }
         }
       },
-      getSession:()=>rhythmSession,
+      getSession:()=>rhythmSession||(loopPractice?.guided?{timeline:loopPractice.timeline,loopPractice,anchorMs:null}:null),
       getTempo:()=>({bpm:selectedBpm(),speed:selectedMultiplier()}),
       onNarrate:()=>elements.voiceRead.click()
     });
@@ -1167,7 +1258,7 @@ async function boot(){
       elements.lesson.append(option);
     });
     elements.lesson.value=engine.lesson.id;
-    elements.releaseStatus.textContent=`v2.8 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord/two-hand lessons · ${loaded.source}`;
+    elements.releaseStatus.textContent=`v2.9 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord/two-hand lessons · ${loaded.source}`;
     elements.releaseStatus.classList.toggle('catalog-warning',!!loaded.warning);
     if(loaded.warning){elements.releaseStatus.textContent+=' · WARNING: '+loaded.warning;console.warn(loaded.warning);}
     syncRhythmLesson();
@@ -1186,7 +1277,13 @@ async function boot(){
   // Best effort: listing device labels can be slow or fail on Android.
   void refreshMicrophones();
   elements.rhythmStart.addEventListener('click',startRhythm);
-  elements.rhythmLoop.addEventListener('change',()=>{if(rhythmSession)stopRhythm();elements.rhythmLoopStatus.textContent=elements.rhythmLoop.checked?'3 tries · 1 bar between':'Repeat challenge off';});
+  elements.rhythmLoop.addEventListener('change',()=>{
+    stopRhythm({message:false});
+    engine.restart();
+    if(elements.rhythmLoop.checked&&gameUI?.mode==='learn')createGuidedLoop();
+    render();
+    elements.rhythmLoopStatus.textContent=elements.rhythmLoop.checked?(gameUI?.mode==='learn'?'Repetition 1 / 3':'3 repetitions · 1 bar between'):'Repeat challenge off';
+  });
   elements.rhythmStop.addEventListener('click',()=>stopRhythm());
   elements.rhythmBpm.addEventListener('change',changeRhythmSettings);
   elements.rhythmSpeed.addEventListener('change',changeRhythmSettings);

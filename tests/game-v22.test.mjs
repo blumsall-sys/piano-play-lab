@@ -8,7 +8,7 @@ import {eventTimeline} from '../js/rhythm.js';
 const lessons=JSON.parse(readFileSync(new URL('../lessons/lessons.json',import.meta.url),'utf8'));
 function storage(){const values=new Map();return {getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value),removeItem:key=>values.delete(key)}}
 test('Twenty lessons and every lesson begins its spoken instructions for Cleo',()=>{
- assert.equal(lessons.length,20);
+ assert.ok(lessons.length>=50);
  for(const l of lessons)assert.match(l.spokenInstructions,/^Hey Cleo, for this lesson we are going to /,l.id);
 });
 test('Sequential lesson unlocking requires a passing 70% score',()=>{
@@ -16,7 +16,7 @@ test('Sequential lesson unlocking requires a passing 70% score',()=>{
  assert.equal(unlockedThrough(lessons,[{lessonId:lessons[0].id,keyAccuracy:69}]),1);
  assert.equal(unlockedThrough(lessons,[{lessonId:lessons[0].id,keyAccuracy:70}]),2);
  assert.equal(unlockedThrough(lessons,[{lessonId:lessons[0].id,keyAccuracy:100},{lessonId:lessons[1].id,keyAccuracy:80}]),3);
- assert.equal(unlockedThrough(lessons,[],true),20);
+ assert.equal(unlockedThrough(lessons,[],true),lessons.length);
 });
 test('Three learning checkpoints cover the full playable note sequence',()=>{
  const engine=new LessonEngine(lessons);

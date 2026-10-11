@@ -88,9 +88,10 @@ export class GameUI{
     map.id='screen-map';map.append(history);
     const play=create('section','game-page game-player',`<div class="player-topbar"><div><span class="overline">NOW PLAYING · <span id="player-lesson-number">LESSON 1</span></span><h2 id="player-lesson-title">Find the First F</h2></div><div class="player-actions"><span id="player-stars">☆ ☆ ☆</span><button class="btn btn-secondary" id="game-narrate">🔊 Hear Cleo's instructions</button><button class="btn btn-secondary" data-page="map">✕ Exit</button></div></div><div id="lesson-checkpoints" class="checkpoint-track" aria-label="Lesson checkpoints"></div><div class="highway-title"><div><span class="overline">RHYTHM HIGHWAY</span><p>Read ahead: notes travel toward the <b>PLAY</b> line.</p></div><div id="mode-switch" class="mode-switch" role="group" aria-label="Practice mode"><button type="button" data-mode="learn" aria-pressed="true">Learn · no timer</button><button type="button" data-mode="perform" aria-pressed="false">Perform · on beat</button></div></div>`);
     play.id='screen-play';
+    const handCoach=create('div','hand-coach',`<span class="hand-coach-icon">✋</span><span id="hand-coach-text">Follow the gold notes. Hand and finger hints appear here when a lesson teaches them.</span>`);
     const highwayBox=create('div','highway-box',`<canvas id="highway-canvas" height="180" aria-label="Scrolling rhythm highway displaying note names, chords, and durations"></canvas><div class="highway-key"><span class="dot gold"></span> Current <span class="dot blue"></span> Upcoming <span class="dot green"></span> Completed</div>`);
     // Rhythm controls ABOVE the notes; notes sit immediately above the piano.
-    play.append(lesson,rhythm,highwayBox,piano);
+    play.append(lesson,rhythm,handCoach,highwayBox,piano);
     // Keep the key colour guide next to the highway's beat legend, not above the piano.
     const redundantHeading=piano.querySelector('.section-heading');
     const keyLegend=redundantHeading?.querySelector('.legend');
@@ -214,6 +215,13 @@ export class GameUI{
     saveActive(state);
     $('player-lesson-number').textContent=`LESSON ${state.lessonIndex+1} / ${this.engine.lessons.length}`;
     $('player-lesson-title').textContent=state.lesson.title;
+    const handCoach=$('hand-coach-text');
+    if(handCoach){
+      const guidance=state.lesson.handAssignments?.[state.position];
+      const code=guidance?(Array.isArray(guidance)?guidance.join(' + '):guidance):null;
+      handCoach.textContent=state.lesson.handGuide?(code?`${code} · ${state.lesson.handGuide}`:state.lesson.handGuide):'Follow the gold notes as they reach the play line.';
+      handCoach.closest('.hand-coach').hidden=!state.lesson.handGuide;
+    }
     const done=state.position,steps=checkpoints(state);
     $('lesson-checkpoints').innerHTML=steps.map((s,i)=>`<div class="checkpoint ${s.done?'complete':(done>=s.start?'active':'')}"><span class="checkpoint-icon">${s.done?'✓':i+1}</span><span>Step ${i+1}<b>${s.label}</b></span></div>`).join('');
     $('player-stars').textContent=state.done?'★ ★ ★':`${state.position} / ${state.length} notes`;
@@ -232,7 +240,7 @@ export class GameUI{
       const best=Math.max(0,...h.filter(x=>x.lessonId===l.id).map(x=>x.keyAccuracy||0));
       const passed=best>=PASS,locked=i>=allowed;
       const n=create('button',`map-card ${passed?'passed':''} ${locked?'locked':''}`,
-        `<span class="map-index">${locked?'🔒':passed?'✓':String(i+1).padStart(2,'0')}</span><span class="map-type">${l.notes.some(Array.isArray)?'CHORDS':i<4?'STARTER':'MELODY'}</span><strong>${html(l.title)}</strong><small>${passed?`★ ${Math.round(best)}% best`:locked?'Finish the earlier lesson to unlock':`${l.notes.length} musical steps`}</small><span class="map-play">${locked?'Locked':'Play →'}</span>`);
+        `<span class="map-index">${locked?'🔒':passed?'✓':String(i+1).padStart(2,'0')}</span><span class="map-type">${l.category==='hands'?'TWO HANDS':l.category==='theory'?'MUSIC THEORY':l.category==='rhythm'?'RHYTHM':l.notes.some(Array.isArray)?'CHORDS':i<4?'STARTER':'MELODY'}</span><strong>${html(l.title)}</strong><small>${passed?`★ ${Math.round(best)}% best`:locked?'Finish the earlier lesson to unlock':`${l.notes.length} musical steps`}</small><span class="map-play">${locked?'Locked':'Play →'}</span>`);
       n.disabled=locked;n.addEventListener('click',()=>this.selectLesson(i));grid.append(n);
     });
   }

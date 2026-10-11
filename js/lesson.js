@@ -11,6 +11,14 @@ export function validateLessons(lessons){
    if(!notes.length||notes.length>5||new Set(notes).size!==notes.length||notes.some(n=>!Number.isInteger(n)||n<MIN_MIDI||n>MAX_MIDI))throw new Error('Invalid note/chord in '+lesson.id);
   }
   if(lesson.melodyBeats&&(!Array.isArray(lesson.melodyBeats)||lesson.melodyBeats.length!==lesson.notes.length||lesson.melodyBeats.some(b=>!Number.isFinite(b)||b<=0)))throw new Error('Invalid note durations in '+lesson.id);
+  if(lesson.handAssignments!==undefined){
+   if(!Array.isArray(lesson.handAssignments)||lesson.handAssignments.length!==lesson.notes.length)throw new Error('Invalid finger guidance in '+lesson.id);
+   for(let i=0;i<lesson.notes.length;i++){
+    const fingers=eventNotes(lesson.handAssignments[i]),notes=eventNotes(lesson.notes[i]);
+    if(fingers.length!==notes.length||fingers.some(x=>typeof x!=='string'||! /^(LH|RH)[1-5]$/.test(x)))throw new Error('Invalid finger guidance in '+lesson.id);
+   }
+  }
+
  }
  return lessons;
 }

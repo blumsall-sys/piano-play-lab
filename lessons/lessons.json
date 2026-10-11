@@ -657,5 +657,1672 @@
       2,
       4
     ]
+  },
+  {
+    "id": "rh-five-fingers",
+    "title": "Right Hand: Five Fingers",
+    "description": "learn the right-hand finger numbers one to five over F, G, A, B flat and C",
+    "hint": "Use right thumb on F4, then fingers 2, 3, 4, 5 as notes rise.",
+    "category": "hands",
+    "bpm": 66,
+    "notes": [
+      65,
+      67,
+      69,
+      70,
+      72,
+      70,
+      69,
+      67,
+      65
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "handAssignments": [
+      "RH1",
+      "RH2",
+      "RH3",
+      "RH4",
+      "RH5",
+      "RH4",
+      "RH3",
+      "RH2",
+      "RH1"
+    ],
+    "handGuide": "Right hand: fingers 1 to 5, starting with your thumb on F4.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to learn the right-hand finger numbers one to five over F, G, A, B flat and C! Right hand: fingers 1 to 5, starting with your thumb on F4. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "rh-finger-skip",
+    "title": "Right Hand: Little Skips",
+    "description": "practice skipping between right-hand fingers without rushing",
+    "hint": "F4 is right thumb, A4 is finger 3, C5 is little finger 5.",
+    "category": "hands",
+    "bpm": 64,
+    "notes": [
+      65,
+      69,
+      67,
+      70,
+      69,
+      72,
+      70,
+      67,
+      65
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "handAssignments": [
+      "RH1",
+      "RH3",
+      "RH2",
+      "RH4",
+      "RH3",
+      "RH5",
+      "RH4",
+      "RH2",
+      "RH1"
+    ],
+    "handGuide": "Keep your right hand gently curved; avoid lifting your wrist too high.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to practice skipping between right-hand fingers without rushing! Keep your right hand gently curved; avoid lifting your wrist too high. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "lh-five-fingers",
+    "title": "Left Hand: Five Fingers",
+    "description": "learn the five left-hand finger positions from F3 to C4",
+    "hint": "Left little finger 5 begins on F3; your thumb 1 ends on C4.",
+    "category": "hands",
+    "bpm": 64,
+    "notes": [
+      53,
+      55,
+      57,
+      58,
+      60,
+      58,
+      57,
+      55,
+      53
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "handAssignments": [
+      "LH5",
+      "LH4",
+      "LH3",
+      "LH2",
+      "LH1",
+      "LH2",
+      "LH3",
+      "LH4",
+      "LH5"
+    ],
+    "handGuide": "Left hand: finger 5 on F3, 4 on G3, 3 on A3, 2 on B-flat3, and thumb 1 on C4.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to learn the five left-hand finger positions from F3 to C4! Left hand: finger 5 on F3, 4 on G3, 3 on A3, 2 on B-flat3, and thumb 1 on C4. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "lh-three-note-hop",
+    "title": "Left Hand: Little Hops",
+    "description": "make small left-hand jumps between F3, A3, and C4",
+    "hint": "Start with left finger 5 on F3, then finger 3 on A3.",
+    "category": "hands",
+    "bpm": 62,
+    "notes": [
+      53,
+      57,
+      60,
+      57,
+      53,
+      55,
+      58,
+      60,
+      53
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "handAssignments": [
+      "LH5",
+      "LH3",
+      "LH1",
+      "LH3",
+      "LH5",
+      "LH4",
+      "LH2",
+      "LH1",
+      "LH5"
+    ],
+    "handGuide": "Move gently and keep the left wrist relaxed.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to make small left-hand jumps between F3, A3, and C4! Move gently and keep the left wrist relaxed. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "quarter-pulse",
+    "title": "Quarter Notes: Steady Steps",
+    "description": "play one key on every steady quarter-note beat",
+    "hint": "Each block lasts one metronome beat.",
+    "category": "rhythm",
+    "bpm": 70,
+    "notes": [
+      65,
+      67,
+      69,
+      67,
+      65,
+      67,
+      69,
+      65
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "handAssignments": [
+      "RH1",
+      "RH2",
+      "RH3",
+      "RH2",
+      "RH1",
+      "RH2",
+      "RH3",
+      "RH1"
+    ],
+    "handGuide": "Say one, two, three, four as you play.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play one key on every steady quarter-note beat! Say one, two, three, four as you play. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "short-long-pattern",
+    "title": "Short and Long: Eighths and Halves",
+    "description": "hear the difference between quick eighth notes and longer half notes",
+    "hint": "Short blocks last half a beat; long blocks last two beats.",
+    "category": "rhythm",
+    "bpm": 72,
+    "notes": [
+      65,
+      67,
+      69,
+      69,
+      67,
+      65,
+      65,
+      72
+    ],
+    "melodyBeats": [
+      0.5,
+      0.5,
+      1,
+      2,
+      0.5,
+      0.5,
+      1,
+      2
+    ],
+    "handAssignments": [
+      "RH1",
+      "RH2",
+      "RH3",
+      "RH3",
+      "RH2",
+      "RH1",
+      "RH1",
+      "RH5"
+    ],
+    "handGuide": "Lightly tap the short notes; hold the longer notes for their full beat value.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to hear the difference between quick eighth notes and longer half notes! Lightly tap the short notes; hold the longer notes for their full beat value. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "steps-and-skips",
+    "title": "Music Theory: Steps and Skips",
+    "description": "recognize the difference between neighbouring steps and bigger skips",
+    "hint": "Step F to G, then skip A to C.",
+    "category": "theory",
+    "bpm": 70,
+    "notes": [
+      65,
+      67,
+      69,
+      72,
+      69,
+      67,
+      65,
+      69,
+      65
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "handAssignments": [
+      "RH1",
+      "RH2",
+      "RH3",
+      "RH5",
+      "RH3",
+      "RH2",
+      "RH1",
+      "RH3",
+      "RH1"
+    ],
+    "handGuide": "A step moves to the next note name; a skip leaps over a note.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to recognize the difference between neighbouring steps and bigger skips! A step moves to the next note name; a skip leaps over a note. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "flat-key-adventure",
+    "title": "Meet the B-flat Key",
+    "description": "find and play B-flat, the first black key in our F-major pattern",
+    "hint": "B-flat is the black key between A and B.",
+    "category": "theory",
+    "bpm": 70,
+    "notes": [
+      69,
+      70,
+      72,
+      70,
+      69,
+      67,
+      65,
+      70,
+      69,
+      65
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "handAssignments": [
+      "RH3",
+      "RH4",
+      "RH5",
+      "RH4",
+      "RH3",
+      "RH2",
+      "RH1",
+      "RH4",
+      "RH3",
+      "RH1"
+    ],
+    "handGuide": "In this five-finger position, right finger 4 reaches B-flat4.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to find and play B-flat, the first black key in our F-major pattern! In this five-finger position, right finger 4 reaches B-flat4. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "call-and-response-hands",
+    "title": "Two Hands: Answer Each Other",
+    "description": "alternate between the low left-hand notes and high right-hand notes",
+    "hint": "Left F3, right F4, left G3, right G4 and so on.",
+    "category": "hands",
+    "bpm": 66,
+    "notes": [
+      53,
+      65,
+      55,
+      67,
+      57,
+      69,
+      58,
+      70,
+      60,
+      72
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "handAssignments": [
+      "LH5",
+      "RH1",
+      "LH4",
+      "RH2",
+      "LH3",
+      "RH3",
+      "LH2",
+      "RH4",
+      "LH1",
+      "RH5"
+    ],
+    "handGuide": "The left hand plays first, then the right hand answers. Do not play together yet.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to alternate between the low left-hand notes and high right-hand notes! The left hand plays first, then the right hand answers. Do not play together yet. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "mirror-hands",
+    "title": "Two Hands: Mirror Pairs",
+    "description": "play matching letter names with left and right hands together",
+    "hint": "For each pair, press one low and one high note at the same time.",
+    "category": "hands",
+    "bpm": 60,
+    "notes": [
+      [
+        53,
+        65
+      ],
+      [
+        55,
+        67
+      ],
+      [
+        57,
+        69
+      ],
+      [
+        58,
+        70
+      ],
+      [
+        60,
+        72
+      ]
+    ],
+    "melodyBeats": [
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "handAssignments": [
+      [
+        "LH5",
+        "RH1"
+      ],
+      [
+        "LH4",
+        "RH2"
+      ],
+      [
+        "LH3",
+        "RH3"
+      ],
+      [
+        "LH2",
+        "RH4"
+      ],
+      [
+        "LH1",
+        "RH5"
+      ]
+    ],
+    "handGuide": "Left pinky F3 and right thumb F4 start the first pair. This is a two-hand chord exercise.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play matching letter names with left and right hands together! Left pinky F3 and right thumb F4 start the first pair. This is a two-hand chord exercise. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "hot-cross-buns",
+    "title": "Hot Cross Buns",
+    "description": "play the familiar three-note Hot Cross Buns tune",
+    "hint": "Begin E4, then D4, then C4.",
+    "category": "song",
+    "bpm": 76,
+    "notes": [
+      64,
+      62,
+      60,
+      64,
+      62,
+      60,
+      60,
+      60,
+      60,
+      60,
+      62,
+      62,
+      62,
+      62,
+      64,
+      62,
+      60
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      1,
+      1,
+      2
+    ],
+    "handGuide": "This traditional beginner tune uses only C, D and E; try your right-hand fingers 1, 2 and 3.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play the familiar three-note Hot Cross Buns tune! This traditional beginner tune uses only C, D and E; try your right-hand fingers 1, 2 and 3. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "frere-jacques",
+    "title": "Frère Jacques",
+    "description": "play the recognizable French nursery-song melody Frère Jacques",
+    "hint": "Begin on C4 and repeat the opening phrase twice.",
+    "category": "song",
+    "bpm": 78,
+    "notes": [
+      60,
+      62,
+      64,
+      60,
+      60,
+      62,
+      64,
+      60,
+      64,
+      65,
+      67,
+      64,
+      65,
+      67,
+      67,
+      69,
+      67,
+      65,
+      64,
+      60,
+      67,
+      69,
+      67,
+      65,
+      64,
+      60
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      1,
+      1,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      1,
+      1
+    ],
+    "handGuide": "The same musical phrase repeats, so look ahead and recognize the pattern.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play the recognizable French nursery-song melody Frère Jacques! The same musical phrase repeats, so look ahead and recognize the pattern. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "ode-to-joy",
+    "title": "Ode to Joy · Easy Theme",
+    "description": "play the opening theme of Beethoven’s Ode to Joy",
+    "hint": "Start with two E4 notes, then F4 and G4.",
+    "category": "song",
+    "bpm": 76,
+    "notes": [
+      64,
+      64,
+      65,
+      67,
+      67,
+      65,
+      64,
+      62,
+      60,
+      60,
+      62,
+      64,
+      64,
+      62,
+      62
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2
+    ],
+    "handGuide": "This classical melody is public domain, and it uses gentle steps between neighbouring notes.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play the opening theme of Beethoven’s Ode to Joy! This classical melody is public domain, and it uses gentle steps between neighbouring notes. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "london-bridge",
+    "title": "London Bridge Is Falling Down",
+    "description": "play the traditional London Bridge melody",
+    "hint": "Start G4, A4, G4, F4, E4.",
+    "category": "song",
+    "bpm": 80,
+    "notes": [
+      67,
+      69,
+      67,
+      65,
+      64,
+      65,
+      67,
+      62,
+      64,
+      65,
+      64,
+      65,
+      67,
+      67,
+      69,
+      67,
+      65,
+      64,
+      65,
+      67,
+      62,
+      67,
+      64,
+      60
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2
+    ],
+    "handGuide": "Listen for the familiar repeated shape and the notes moving down and up.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play the traditional London Bridge melody! Listen for the familiar repeated shape and the notes moving down and up. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "row-your-boat",
+    "title": "Row Row Row Your Boat",
+    "description": "play a recognizable excerpt of Row Row Row Your Boat",
+    "hint": "Start with three C4 notes, then step upward.",
+    "category": "song",
+    "bpm": 76,
+    "notes": [
+      60,
+      60,
+      60,
+      62,
+      64,
+      64,
+      62,
+      64,
+      65,
+      67,
+      72,
+      72,
+      72,
+      67,
+      67,
+      67,
+      64,
+      64,
+      64,
+      60,
+      60,
+      60,
+      67,
+      65,
+      64,
+      62,
+      60
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2
+    ],
+    "handGuide": "A rowing rhythm feels smooth and steady; count the repeated notes.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play a recognizable excerpt of Row Row Row Your Boat! A rowing rhythm feels smooth and steady; count the repeated notes. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "jingle-bells",
+    "title": "Jingle Bells · Chorus",
+    "description": "play the traditional Jingle Bells chorus",
+    "hint": "Start with repeated E4 notes: E, E, E.",
+    "category": "song",
+    "bpm": 84,
+    "notes": [
+      64,
+      64,
+      64,
+      64,
+      64,
+      64,
+      64,
+      67,
+      60,
+      62,
+      64,
+      65,
+      65,
+      65,
+      65,
+      65,
+      64,
+      64,
+      64,
+      64,
+      62,
+      62,
+      64,
+      62,
+      67
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2
+    ],
+    "handGuide": "The repeated notes sound like little bells; lift your finger gently each time.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play the traditional Jingle Bells chorus! The repeated notes sound like little bells; lift your finger gently each time. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "old-macdonald",
+    "title": "Old MacDonald · Opening",
+    "description": "play the opening of Old MacDonald Had a Farm",
+    "hint": "Begin C4, C4, C4 and jump to G3.",
+    "category": "song",
+    "bpm": 78,
+    "notes": [
+      60,
+      60,
+      60,
+      55,
+      57,
+      57,
+      55,
+      64,
+      64,
+      62,
+      62,
+      60,
+      55,
+      55,
+      53,
+      53,
+      60
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2
+    ],
+    "handGuide": "The left-hand low notes can be played with a relaxed hand while you learn the melody.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play the opening of Old MacDonald Had a Farm! The left-hand low notes can be played with a relaxed hand while you learn the melody. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "dancing-dinosaur",
+    "title": "Dancing Dinosaur · Original",
+    "description": "play a playful dinosaur march with little melodic jumps",
+    "hint": "Start on F4, climb to C5, and march back down.",
+    "category": "original",
+    "bpm": 82,
+    "notes": [
+      65,
+      67,
+      69,
+      72,
+      69,
+      67,
+      65,
+      60,
+      65,
+      67,
+      69,
+      72,
+      74,
+      72,
+      69,
+      65
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      0.5,
+      0.5,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      0.5,
+      0.5,
+      1,
+      1,
+      1,
+      2
+    ],
+    "handGuide": "Keep a steady march and watch for the quick, bouncy notes.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play a playful dinosaur march with little melodic jumps! Keep a steady march and watch for the quick, bouncy notes. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "when-saints",
+    "title": "When the Saints Go Marching In",
+    "description": "play the recognizable traditional opening to When the Saints Go Marching In",
+    "hint": "Start with C4, E4, F4 and G4.",
+    "category": "song",
+    "bpm": 78,
+    "notes": [
+      60,
+      64,
+      65,
+      67,
+      60,
+      64,
+      65,
+      67,
+      60,
+      64,
+      65,
+      67,
+      64,
+      60,
+      64,
+      62,
+      60
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2
+    ],
+    "handGuide": "Hear how the melody rises in little steps as if a parade is approaching.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play the recognizable traditional opening to When the Saints Go Marching In! Hear how the melody rises in little steps as if a parade is approaching. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "three-blind-mice",
+    "title": "Three Blind Mice · Easy Tune",
+    "description": "play the familiar descending notes of Three Blind Mice",
+    "hint": "Begin E4, D4 and C4, then repeat.",
+    "category": "song",
+    "bpm": 74,
+    "notes": [
+      64,
+      62,
+      60,
+      64,
+      62,
+      60,
+      67,
+      65,
+      64,
+      62,
+      60,
+      60,
+      62,
+      64,
+      60
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      2
+    ],
+    "handGuide": "Notice the repeated three-note downward pattern.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play the familiar descending notes of Three Blind Mice! Notice the repeated three-note downward pattern. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "bass-melody-pairs",
+    "title": "Left Bass + Right Melody",
+    "description": "play a low F3 with moving right-hand melody notes",
+    "hint": "Hold the hands over two different parts of the keyboard; press each pair together.",
+    "category": "hands",
+    "bpm": 60,
+    "notes": [
+      [
+        53,
+        65
+      ],
+      [
+        53,
+        67
+      ],
+      [
+        53,
+        69
+      ],
+      [
+        53,
+        72
+      ],
+      [
+        53,
+        69
+      ],
+      [
+        53,
+        67
+      ],
+      [
+        53,
+        65
+      ]
+    ],
+    "melodyBeats": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "handAssignments": [
+      [
+        "LH5",
+        "RH1"
+      ],
+      [
+        "LH5",
+        "RH2"
+      ],
+      [
+        "LH5",
+        "RH3"
+      ],
+      [
+        "LH5",
+        "RH5"
+      ],
+      [
+        "LH5",
+        "RH3"
+      ],
+      [
+        "LH5",
+        "RH2"
+      ],
+      [
+        "LH5",
+        "RH1"
+      ]
+    ],
+    "handGuide": "Left finger 5 plays F3; right-hand fingers move between F4, G4, A4 and C5.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play a low F3 with moving right-hand melody notes! Left finger 5 plays F3; right-hand fingers move between F4, G4, A4 and C5. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "new-bass-c",
+    "title": "Change the Left Hand Bass",
+    "description": "pair a left-hand C4 with a gentle right-hand melody",
+    "hint": "The C4 bass stays while the high note moves.",
+    "category": "hands",
+    "bpm": 60,
+    "notes": [
+      [
+        60,
+        65
+      ],
+      [
+        60,
+        67
+      ],
+      [
+        60,
+        69
+      ],
+      [
+        60,
+        72
+      ],
+      [
+        60,
+        69
+      ],
+      [
+        60,
+        65
+      ]
+    ],
+    "melodyBeats": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "handAssignments": [
+      [
+        "LH1",
+        "RH1"
+      ],
+      [
+        "LH1",
+        "RH2"
+      ],
+      [
+        "LH1",
+        "RH3"
+      ],
+      [
+        "LH1",
+        "RH5"
+      ],
+      [
+        "LH1",
+        "RH3"
+      ],
+      [
+        "LH1",
+        "RH1"
+      ]
+    ],
+    "handGuide": "Try left thumb 1 on C4, and use the right-hand fingers for the melody.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to pair a left-hand C4 with a gentle right-hand melody! Try left thumb 1 on C4, and use the right-hand fingers for the melody. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "two-hand-conversation",
+    "title": "A Conversation Between Hands",
+    "description": "trade a melody from left hand to right hand in alternating turns",
+    "hint": "Listen for left, right, left, right.",
+    "category": "hands",
+    "bpm": 68,
+    "notes": [
+      53,
+      65,
+      55,
+      67,
+      57,
+      69,
+      60,
+      72,
+      57,
+      69,
+      55,
+      67,
+      53,
+      65
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "handAssignments": [
+      "LH5",
+      "RH1",
+      "LH4",
+      "RH2",
+      "LH3",
+      "RH3",
+      "LH1",
+      "RH5",
+      "LH3",
+      "RH3",
+      "LH4",
+      "RH2",
+      "LH5",
+      "RH1"
+    ],
+    "handGuide": "Play one note at a time, handing the tune back and forth.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to trade a melody from left hand to right hand in alternating turns! Play one note at a time, handing the tune back and forth. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "hand-pairs-in-time",
+    "title": "Two-Hand Pairs on the Beat",
+    "description": "coordinate two fingers at the same instant on a steady beat",
+    "hint": "Play F3 with one right-hand note each time.",
+    "category": "hands",
+    "bpm": 64,
+    "notes": [
+      [
+        53,
+        65
+      ],
+      [
+        53,
+        67
+      ],
+      [
+        53,
+        69
+      ],
+      [
+        53,
+        70
+      ],
+      [
+        53,
+        72
+      ],
+      [
+        53,
+        70
+      ],
+      [
+        53,
+        69
+      ],
+      [
+        53,
+        65
+      ]
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      2
+    ],
+    "handAssignments": [
+      [
+        "LH5",
+        "RH1"
+      ],
+      [
+        "LH5",
+        "RH2"
+      ],
+      [
+        "LH5",
+        "RH3"
+      ],
+      [
+        "LH5",
+        "RH4"
+      ],
+      [
+        "LH5",
+        "RH5"
+      ],
+      [
+        "LH5",
+        "RH4"
+      ],
+      [
+        "LH5",
+        "RH3"
+      ],
+      [
+        "LH5",
+        "RH1"
+      ]
+    ],
+    "handGuide": "Watch the hit line: both hands should arrive together in Perform Mode.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to coordinate two fingers at the same instant on a steady beat! Watch the hit line: both hands should arrive together in Perform Mode. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "bass-and-right-triad",
+    "title": "Left Bass + Right F Chord",
+    "description": "play an F3 bass note with a right-hand F-major triad",
+    "hint": "Four gold keys are expected: F3, F4, A4 and C5.",
+    "category": "chords",
+    "bpm": 52,
+    "notes": [
+      [
+        53,
+        65,
+        69,
+        72
+      ],
+      [
+        53,
+        65,
+        69,
+        72
+      ],
+      [
+        53,
+        65,
+        69,
+        72
+      ]
+    ],
+    "melodyBeats": [
+      4,
+      4,
+      4
+    ],
+    "handAssignments": [
+      [
+        "LH5",
+        "RH1",
+        "RH3",
+        "RH5"
+      ],
+      [
+        "LH5",
+        "RH1",
+        "RH3",
+        "RH5"
+      ],
+      [
+        "LH5",
+        "RH1",
+        "RH3",
+        "RH5"
+      ]
+    ],
+    "handGuide": "Use right-hand fingers 1, 3, 5 on F4, A4, C5; left finger 5 on F3. Build notes one by one if using the mic.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play an F3 bass note with a right-hand F-major triad! Use right-hand fingers 1, 3, 5 on F4, A4, C5; left finger 5 on F3. Build notes one by one if using the mic. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "bass-and-right-c",
+    "title": "Left Bass + Right C Chord",
+    "description": "play the C4 bass together with a right-hand C-major shape",
+    "hint": "The notes are C4, E4, G4 and C5.",
+    "category": "chords",
+    "bpm": 52,
+    "notes": [
+      [
+        60,
+        64,
+        67,
+        72
+      ],
+      [
+        60,
+        64,
+        67,
+        72
+      ],
+      [
+        60,
+        64,
+        67,
+        72
+      ]
+    ],
+    "melodyBeats": [
+      4,
+      4,
+      4
+    ],
+    "handAssignments": [
+      [
+        "LH1",
+        "RH1",
+        "RH3",
+        "RH5"
+      ],
+      [
+        "LH1",
+        "RH1",
+        "RH3",
+        "RH5"
+      ],
+      [
+        "LH1",
+        "RH1",
+        "RH3",
+        "RH5"
+      ]
+    ],
+    "handGuide": "Place the left thumb on C4 and the right hand over E4, G4 and C5. Stop if any stretch feels uncomfortable.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play the C4 bass together with a right-hand C-major shape! Place the left thumb on C4 and the right hand over E4, G4 and C5. Stop if any stretch feels uncomfortable. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "bass-change-groove",
+    "title": "Two-Hand Bass Change Groove",
+    "description": "alternate F and C bass notes while right-hand melody notes change",
+    "hint": "The first pairs use F3 bass; later pairs use C4 bass.",
+    "category": "hands",
+    "bpm": 65,
+    "notes": [
+      [
+        53,
+        65
+      ],
+      [
+        53,
+        69
+      ],
+      [
+        60,
+        67
+      ],
+      [
+        60,
+        72
+      ],
+      [
+        53,
+        65
+      ],
+      [
+        53,
+        72
+      ]
+    ],
+    "melodyBeats": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      2
+    ],
+    "handAssignments": [
+      [
+        "LH5",
+        "RH1"
+      ],
+      [
+        "LH5",
+        "RH3"
+      ],
+      [
+        "LH1",
+        "RH2"
+      ],
+      [
+        "LH1",
+        "RH5"
+      ],
+      [
+        "LH5",
+        "RH1"
+      ],
+      [
+        "LH5",
+        "RH5"
+      ]
+    ],
+    "handGuide": "Prepare your left hand to move from F3 to C4 while the right hand keeps playing.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to alternate F and C bass notes while right-hand melody notes change! Prepare your left hand to move from F3 to C4 while the right hand keeps playing. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "chord-change-story",
+    "title": "A Little Chord Story",
+    "description": "play a slow story made of F major, B-flat major, C major and D minor",
+    "hint": "Take one complete chord at a time; listen for the different moods.",
+    "category": "chords",
+    "bpm": 62,
+    "notes": [
+      [
+        53,
+        57,
+        60
+      ],
+      [
+        58,
+        62,
+        65
+      ],
+      [
+        60,
+        64,
+        67
+      ],
+      [
+        53,
+        57,
+        60
+      ],
+      [
+        62,
+        65,
+        69
+      ],
+      [
+        53,
+        57,
+        60
+      ]
+    ],
+    "melodyBeats": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      4
+    ],
+    "handGuide": "With a microphone, build each chord carefully; with MIDI, try all notes together.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to play a slow story made of F major, B-flat major, C major and D minor! With a microphone, build each chord carefully; with MIDI, try all notes together. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "twinkle-bass",
+    "title": "Twinkle with a Left-Hand Bass",
+    "description": "add a simple low F3 to the opening notes of Twinkle Twinkle",
+    "hint": "Try playing the low F and high melody together on the gold pairs.",
+    "category": "hands",
+    "bpm": 60,
+    "notes": [
+      [
+        53,
+        65
+      ],
+      65,
+      [
+        53,
+        72
+      ],
+      72,
+      [
+        53,
+        74
+      ],
+      74,
+      [
+        53,
+        72
+      ],
+      [
+        53,
+        65
+      ]
+    ],
+    "melodyBeats": [
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      3
+    ],
+    "handAssignments": [
+      [
+        "LH5",
+        "RH1"
+      ],
+      "RH1",
+      [
+        "LH5",
+        "RH5"
+      ],
+      "RH5",
+      [
+        "LH5",
+        "RH5"
+      ],
+      "RH5",
+      [
+        "LH5",
+        "RH5"
+      ],
+      [
+        "LH5",
+        "RH1"
+      ]
+    ],
+    "handGuide": "This is a simplified two-hand arrangement; look ahead so the left hand can prepare for the pairs.",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to add a simple low F3 to the opening notes of Twinkle Twinkle! This is a simplified two-hand arrangement; look ahead so the left hand can prepare for the pairs. First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
+  },
+  {
+    "id": "graduation-song",
+    "title": "Cleo’s First Two-Hand Concert",
+    "description": "finish with a little original concert tune that mixes single notes, two-hand pairs and a chord",
+    "hint": "The last event is a four-note chord. Build it slowly before playing it in time.",
+    "category": "original",
+    "bpm": 65,
+    "notes": [
+      [
+        53,
+        65
+      ],
+      67,
+      [
+        53,
+        69
+      ],
+      70,
+      [
+        60,
+        72
+      ],
+      70,
+      [
+        53,
+        69
+      ],
+      67,
+      [
+        53,
+        65
+      ],
+      [
+        53,
+        65,
+        69,
+        72
+      ]
+    ],
+    "melodyBeats": [
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      1,
+      2,
+      4
+    ],
+    "handAssignments": [
+      [
+        "LH5",
+        "RH1"
+      ],
+      "RH2",
+      [
+        "LH5",
+        "RH3"
+      ],
+      "RH4",
+      [
+        "LH1",
+        "RH5"
+      ],
+      "RH4",
+      [
+        "LH5",
+        "RH3"
+      ],
+      "RH2",
+      [
+        "LH5",
+        "RH1"
+      ],
+      [
+        "LH5",
+        "RH1",
+        "RH3",
+        "RH5"
+      ]
+    ],
+    "handGuide": "First play the pairs, then finish with an F-major harmony. Great work using two hands!",
+    "spokenInstructions": "Hey Cleo, for this lesson we are going to finish with a little original concert tune that mixes single notes, two-hand pairs and a chord! First play the pairs, then finish with an F-major harmony. Great work using two hands! First, listen to the whole melody. Then watch the notes approaching the play line and try them slowly. You can try again whenever you like!"
   }
 ]

@@ -1,4 +1,6 @@
-r"""Synchronize the v1.8.1 embedded lesson catalog with lessons/lessons.json.
+r"""Synchronize the shipped offline fallback in index.html with lessons/lessons.json.
+For FUTURE GitHub Pages lesson additions this step is NOT needed.
+The browser fetches lessons/lessons.json first. The embedded catalog is used only if loading fails.
 
 Standard library only. Run from project root:
     py -3 tools\sync-lessons.py

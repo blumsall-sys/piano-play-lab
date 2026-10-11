@@ -4,7 +4,7 @@ import {eventTimeline,RhythmSession,gradeHold,gradeTiming,SPEEDS,lessonBeats} fr
 import {durationName,noteLabel} from '../js/score-strip.js';
 const lessons=JSON.parse(readFileSync(new URL('../lessons/lessons.json',import.meta.url)));
 test('every lesson has deterministic valid rhythm and tempo',()=>{
- assert.equal(lessons.length,20);
+ assert.ok(lessons.length>=50);
  for(const lesson of lessons){
   const beats=lessonBeats(lesson);assert.equal(beats.length,lesson.notes.length);
   const timeline=eventTimeline(lesson,lesson.bpm||80,1);

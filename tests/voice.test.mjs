@@ -17,7 +17,7 @@ function mockSpeech(){
   return {guide,synth,counts};
 }
 test('All twenty lessons have specific spoken instructions',()=>{
-  assert.equal(lessons.length,20);
+  assert.ok(lessons.length>=50);
   for(const l of lessons){
     assert.ok(l.spokenInstructions && l.spokenInstructions.length>75,`${l.id} has no narration`);
     assert.ok(l.spokenInstructions.includes('!') || l.spokenInstructions.includes('.'));

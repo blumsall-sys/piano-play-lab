@@ -1,18 +1,19 @@
-import {GameUI,restoreActive} from './game-ui.js?v=2.7';
-import {Keyboard} from './keyboard.js?v=2.7';
-import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.7';
-import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.7';
-import {LessonEngine,eventNotes} from './lesson.js?v=2.7';
-import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=2.7';
-import {soundNote,soundChime,soundCelebration,soundMelody,midiSoundOn,midiSoundOff,midiSoundAllOff,prepareMidiAudio,setMidiVolume,setChimeVolume,getAudioMix,DEFAULT_MIDI_VOLUME,DEFAULT_CHIME_VOLUME} from './sound.js?v=2.7';
-import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=2.7';
-import {VoiceGuide} from './voice-guide.js?v=2.7';
-import {spectralNotes} from './chord-audio.js?v=2.7';
-import {RhythmSession,eventTimeline,lessonBeats} from './rhythm.js?v=2.7';
-import {Metronome} from './metronome.js?v=2.7';
-import {LoopPractice} from './loop-practice.js?v=2.7';
-import {buildScoreStrip} from './score-strip.js?v=2.7';
-import {loadHistory,saveSession,exportHistory,updateSessionRhythm} from './progress-store.js?v=2.7';
+import {GameUI,restoreActive} from './game-ui.js?v=2.8';
+import {Keyboard} from './keyboard.js?v=2.8';
+import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.8';
+import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.8';
+import {LessonEngine,eventNotes} from './lesson.js?v=2.8';
+import {loadLessonCatalog} from './catalog-loader.js?v=2.8';
+import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=2.8';
+import {soundNote,soundChime,soundCelebration,soundMelody,midiSoundOn,midiSoundOff,midiSoundAllOff,prepareMidiAudio,setMidiVolume,setChimeVolume,getAudioMix,DEFAULT_MIDI_VOLUME,DEFAULT_CHIME_VOLUME} from './sound.js?v=2.8';
+import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=2.8';
+import {VoiceGuide} from './voice-guide.js?v=2.8';
+import {spectralNotes} from './chord-audio.js?v=2.8';
+import {RhythmSession,eventTimeline,lessonBeats} from './rhythm.js?v=2.8';
+import {Metronome} from './metronome.js?v=2.8';
+import {LoopPractice} from './loop-practice.js?v=2.8';
+import {buildScoreStrip} from './score-strip.js?v=2.8';
+import {loadHistory,saveSession,exportHistory,updateSessionRhythm} from './progress-store.js?v=2.8';
 
 const $=id=>document.getElementById(id);
 const AUDIO_MIX_STORAGE_KEY='cleos-piano-audio-mix-v2.7';
@@ -1119,15 +1120,15 @@ async function boot(){
   microphone.setCorrection(storedCorrection);
   try{const threshold=localStorage.getItem(SENSITIVITY_STORAGE_KEY);if(threshold&&[...elements.micSensitivity.options].some(o=>o.value===threshold))elements.micSensitivity.value=threshold;}catch{}
   updateMicButton();
-  // Source of truth for this deployed build is embedded in index.html.
-  // This prevents a stale, cached lessons.json from silently reverting to four lessons.
-  // Refreshing microphone device names must not block lesson initialization.
+  // Load lessons.json directly so later curriculum updates need ONE GitHub file only.
+  // A complete embedded snapshot remains as a visible fallback when the JSON is missing or invalid.
+  // Microphone device discovery must not block the lesson catalog.
   try {
     const catalogText=$('embedded-lessons')?.textContent;
-    if(!catalogText)throw new Error('Embedded catalog missing. Upload all v2.0 files.');
-    const catalog=JSON.parse(catalogText);
-    if(catalog.length!==20)throw new Error(`Expected 20 lessons in v2.0, received ${catalog.length}.`);
-    engine=new LessonEngine(catalog);
+    if(!catalogText)throw new Error('Embedded lesson fallback is missing.');
+    const fallback=JSON.parse(catalogText);
+    const loaded=await loadLessonCatalog({fallback});
+    engine=new LessonEngine(loaded.lessons);
     restoreActive(engine);
     gameUI=new GameUI({
       engine,
@@ -1166,7 +1167,9 @@ async function boot(){
       elements.lesson.append(option);
     });
     elements.lesson.value=engine.lesson.id;
-    elements.releaseStatus.textContent=`v2.7 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord lessons`;
+    elements.releaseStatus.textContent=`v2.8 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord/two-hand lessons · ${loaded.source}`;
+    elements.releaseStatus.classList.toggle('catalog-warning',!!loaded.warning);
+    if(loaded.warning){elements.releaseStatus.textContent+=' · WARNING: '+loaded.warning;console.warn(loaded.warning);}
     syncRhythmLesson();
     buildHistoryUI();
     render();

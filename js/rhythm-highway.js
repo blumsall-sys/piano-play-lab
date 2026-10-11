@@ -80,6 +80,13 @@ export class RhythmHighway {
       }else{
         notes.forEach((m,i)=>ctx.fillText(midiToName(m).replace('#','♯'),x+w/2,blockY+19+i*17,w-8));
       }
+      const assignments=state.lesson.handAssignments?.[event.index];
+      if(assignments && blockH>=86 && notes.length<=3){
+        ctx.fillStyle=passed?'#e4fff8':'#36536a';
+        ctx.font='700 10px system-ui';
+        const caption=Array.isArray(assignments)?assignments.join(' · '):assignments;
+        ctx.fillText(caption,x+w/2,blockY+blockH-9,w-9);
+      }
       ctx.globalAlpha=1;
       if(current){ctx.strokeStyle='#fff6d4';ctx.lineWidth=2;ctx.stroke();}
     });

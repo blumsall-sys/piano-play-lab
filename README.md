@@ -1,95 +1,50 @@
-# Cleo's Piano Play Lab v2.7
+# Cleo's Piano Play Lab v2.8 — 50-Lesson Curriculum
 
-**NEW in v2.7:** Separate, saved MIDI piano and correct-note chime volume controls, and a tighter Rhythm Highway layout with the tempo controls above the scrolling notes. See [`CHANGELOG_v2.7.md`](CHANGELOG_v2.7.md).
+A free, self-hosted music-learning game. This update **retains the first 20 lessons** and adds 30 beginner lessons covering finger positions, left/right-hand coordination, theory, rhythm, familiar public-domain songs and easy chords.
 
-**Previous v2.6: USB MIDI connection repair.** Selecting M-Audio now requests access, and Settings and Practice both offer Connect/Reconnect controls. See `MIDI_TROUBLESHOOTING_v2.6.md` and the independent `midi-test.html` page.
+**New:** Lessons are now loaded from **`lessons/lessons.json` first**, instead of relying exclusively on the copy embedded in `index.html`. Once you deploy v2.8, adding lessons using the existing schema requires updating only `lessons/lessons.json` on GitHub. No recompilation or additional deployment configuration is required. The embedded 50-lesson catalog is a last-known-good backup if the JSON fails to load.
 
-**v2.5: Three-Try Rhythm Highway.** In Practice → Perform, leave **3 tries · 1-bar breaks** enabled and press **Start with 4-beat count-in**. The melody scrolls up to three times, with four empty beats between attempts. Results list the accuracy for every try. See [`REPEAT_CHALLENGE_v2.5.md`](REPEAT_CHALLENGE_v2.5.md).
+## Quick start — Windows
+1. Extract the ZIP. Open the `Cleos_Piano_Play_Lab` folder.
+2. Run `START_WINDOWS.bat`. Keep the server console open.
+3. Open `http://localhost:8000/?build=280` in Chrome or Edge.
+4. Confirm the status says `v2.8 READY · 50 lessons ... lessons.json`.
+5. Open **Lessons**. You should see 50 cards. To try Lessons 21–50 immediately, go to **Settings → Unlock all lessons for testing**.
+6. To test your physical Hape piano, select Hape, start the microphone, and allow browser access. For M-Audio, select the M-Audio layout and connect via USB MIDI.
 
-# Cleo's Piano Play Lab v2.4
+## Publish to GitHub Pages
+1. Upload the contents **inside** the extracted project folder to your existing GitHub repository, replacing older files. Keep `index.html` at the repository root.
+2. Commit/push to `main` and wait for GitHub Pages to deploy.
+3. Open your HTTPS GitHub Pages site with `?build=280` appended; confirm 50 lessons and `lessons.json` in the status. Refresh if an older cached version is visible.
+4. Future curriculum updates: edit/upload **only `lessons/lessons.json`**. See [ADDING_LESSONS_ON_GITHUB.md](ADDING_LESSONS_ON_GITHUB.md).
 
-**New in v2.4:** Dual keyboard layouts. Hape Toy Piano (25 keys, F3–F5, microphone) is the default. Select M-Audio Keystation Mini 32 MK3 (32 keys, C–G, USB MIDI) in Settings. Also includes a voice instruction button in the piano row, red/green microphone status, USB MIDI note sound and first-C key mapping.
+## Gameplay overview
+- **Home:** welcome, Continue and saved progress.
+- **Lessons:** 50 sequentially unlocked lessons and best scores (70% note accuracy to pass). A Settings toggle unlocks all for testing.
+- **Practice:** Rhythm Highway, upcoming notes/chords, note timing, three attempts with one-bar rests, Learn and Perform modes, metronome and sound-balance controls.
+- **Finger guide:** Lessons 21–50 display left/right hand (`LH`/`RH`) and suggested finger numbers (1 thumb through 5 little finger) wherever specified.
+- **Settings:** choose Hape F3–F5 microphone or M-Audio Mini 32 MK3 USB MIDI, connect MIDI, choose volume levels and voice, calibrate microphone F3/C4, optional webcam preview.
+- **Results:** completed/expected presses, note accuracy, on-beat grading where available and saved local history.
 
-**Start here:** `M_AUDIO_SETUP_v2.4.md` for the new controller, `DEPLOY_GITHUB_PAGES_v2.4.md` for website publishing, and `CHANGELOG_v2.4.md` for changes and testing.
+### Input limitations
+The app can verify **notes and timing**, not actual fingers or posture. Finger numbers show suggested technique, not measured technique. Hape microphone chord recognition is experimental; **Build Chord** mode is recommended. For simultaneous chords and held notes, USB MIDI is more reliable. The M-Audio has no internal piano sounds; the browser supplies them.
 
-# Cleo's Piano Play Lab — v2.3 Settings & Calibration Fix
+No cloud account, paid API, or runtime npm installation is required. Progress is stored in the current browser and does not automatically sync between devices. In the lesson map, Export Practice JSON makes a backup. Clearing browser data removes saved progress.
 
-A free, self-hosted, touchscreen-friendly HTML5 piano-learning game. Built for the 25-key Hape-style toy piano shown in the reference photo, **F3 to F5** (15 white keys, 10 black keys). Works locally on Windows and on GitHub Pages with HTTPS. No cloud or paid API is required.
-
-## Get started on Windows
-1. Extract the ZIP. Open the **Cleos_Piano_Play_Lab** folder.
-2. Double-click **START_WINDOWS.bat**. Keep the PowerShell console open.
-3. If the browser does not open automatically, visit **http://localhost:8000/?build=230**.
-4. Click **Continue playing**, then test the on-screen piano before enabling microphone input.
-5. Open **Settings > Microphone setup**, tap **Start listening** there, grant microphone permission and confirm the live meter moves before using **Piano reference check**. You can keep listening when moving back to Practice.
-
-If port 8000 is busy, close your old Piano Play Lab server. Python alternative from inside this project folder: `py -3 -m http.server 8000 --bind 127.0.0.1`.
-
-## GitHub Pages deployment
-1. Create a GitHub repository or update your existing Piano Play Lab repository.
-2. Upload **the files inside Cleos_Piano_Play_Lab**, not the parent folder. `index.html` must be at the repository root.
-3. Commit/push to `main`. Under **Settings > Pages**, use **Deploy from a branch**, `main`, `/(root)`.
-4. Open the GitHub Pages HTTPS URL from your Android tablet, e.g. `https://USERNAME.github.io/REPO/?build=230`. Grant microphone permission if requested.
-5. If an old page is still visible, use a private tab or refresh; confirm the browser title **Cleo's Piano Play Lab · Rhythm Highway v2.3**.
-
-Detailed instructions: `DEPLOY_GITHUB_PAGES_v2.3.md`.
-
-## Settings calibration (v2.3)
-1. Open Settings and tap **Start listening** in the microphone card. The microphone does not need to be started from Practice first.
-2. The meter should respond to piano notes. Tap **1 · Capture F3**, then press and hold the physical far-left key (F3, ~174.61 Hz) for around two seconds.
-3. Tap **2 · Capture C4** and hold the fifth white key (~261.63 Hz).
-4. If both reference readings are stable and agree, tap **Apply measured offset**. The compensation stays saved on this browser and is used automatically when you play lessons.
-5. Use **Clear correction** to return to standard pitch. Switch microphones or retake the references at any time.
-6. You can move between Practice and Settings with the microphone still connected; note scoring is automatically disabled outside the Practice screen.
-
-**Important:** Pitch calibration compensates for stable offsets; it cannot fix inaccurate harmonic or polyphonic recognition. A detected 100-cent shift may indicate a transposed instrument.
-
-## Four screens
-- **Home**: child-friendly greeting, continue, short progress summary.
-- **Lessons**: twenty lessons, best result and sequential progression. Passing requires **70% or better note accuracy**. Testing override under Settings > Unlock all lessons.
-- **Practice**: three checkpoints (Discover, Practice, Perform), visible current/next notes or chords, moving Rhythm Highway with fixed PLAY line, metronome/tempo, on-screen or physical piano input.
-- **Settings**: narration voice, microphone settings and calibration, chord mode, optional MIDI, camera preview and an advanced lesson selector.
-- **Results**: accurate key press metrics, rhythm/hold scores where measurable, stars, retry or next lesson.
-
-## Learn and Perform
-**Learn**: the notes remain at the PLAY line until the student completes each event. No timing pressure; microphone or touch recognition advances the lesson.
-
-**Perform**: select this tab, then press **Start with 4-beat count-in**. Events travel towards and past the PLAY line at a continuous beat rate. The system grades notes/chords that are detected against the score's event times. It does not silently skip an unplayed note, so a learner who falls behind may need to restart. Adjust BPM, ¼×, ½×, 1×, 1.5× or 2× speed. Toggle audible metronome clicks.
-
-**Notation**: the highway is a visual rhythmic note-name view, not engraved staff notation. Notes and chords are grouped and their widths show their durations. Formal MusicXML engraving remains a future enhancement.
-
-## Three checkpoints
-Every lesson shows **Discover**, **Practice** and **Perform** checkpoints spanning the beginning, middle and end of its existing events. Completed checkpoints are indicated visually. Finishing the lesson with >=70% key accuracy unlocks the next lesson. They are progress checkpoints, not three different generated exercises with separate tests.
-
-## Input and limitations
-- Microphone: note-on timing is approximate. Single-note recognition works best. Chord-building is recommended for an acoustic toy piano. Polyphonic simultaneous microphone detection is experimental.
-- MIDI: compatible digital keyboards can supply accurate simultaneous note-on/note-off messages and physical held durations. Web MIDI availability depends on browser/device.
-- On-screen keyboard: touch or mouse supports press duration.
-- Spoken instructions use the browser's Web Speech API. Each lesson begins **“Hey Cleo, for this lesson we are going to…”**. Voice quality and available voices depend on the device.
-- The webcam is a user-controlled preview only, not finger recognition; no recording or uploads occur.
-- The metronome, chimes and narrated voice may be captured by an open microphone. Headphones help. Adjust microphone timing offset under Settings if responses register late.
-- Practice history and unfinished-lesson position are stored in **this browser's local storage**. They do not sync across devices. Clearing site data removes saved progress. Export practice JSON on the Lessons screen to keep a copy.
-- Progress is an educational estimate, not a certification of musical technique.
-
-## Project structure
+## Files
 ```
-index.html                  Website and embedded 20-lesson catalog
-css/styles.css             Retained styling and piano geometry
-css/game-v22.css           Home/Map/Practice/Settings/Results styling
-js/main.js                 Audio input, keyboard, MIDI, grading, lesson events
-js/game-ui.js              Navigation, unlocks, checkpoints, local progress
-js/rhythm-highway.js       Constant-speed canvas rhythm highway
-js/rhythm.js               Timeline, timing and hold grade mathematics
-js/metronome.js            Audio click and count-in scheduler
-js/voice-guide.js          Free browser text-to-speech
-js/progress-store.js       Completed practice history
-lessons/lessons.json       Editable lesson definitions
-assets/                    Editable vector artwork and piano references
-START_WINDOWS.bat          Launch local server
+index.html                    Main application + 50-lesson offline fallback
+lessons/lessons.json         PRIMARY curriculum source for GitHub edits
+js/catalog-loader.js         JSON-first loader with validation/fallback warnings
+js/lesson.js                 Lesson validation and note/chord progression
+js/game-ui.js                Home, map, practice, settings, saved progress
+js/rhythm-highway.js         Continuous beat-driven notes with finger cues
+js/main.js                   App initialization, microphone, MIDI, audio
+css/                         Styling and layout
+assets/                      SVG artwork
+START_WINDOWS.bat            Windows localhost server
+ADDING_LESSONS_ON_GITHUB.md  One-file lesson authoring instructions
+CURRICULUM_50_LESSONS.md     Full updated curriculum outline
 ```
 
-## For developers
-The app uses native JS modules and has no runtime npm dependencies. Run `npm test` with Node.js (optional) to execute the full regression suite. To update lesson narration or pitches, edit `lessons/lessons.json` **and** synchronize the `embedded-lessons` JSON in `index.html` to keep the two identical. Running `node --test tests/*.test.mjs` checks consistency.
-
-## Release
-v2.3 (October 2026). See `CHANGELOG_v2.3.md`.
+Run `node tools/validate-lessons.mjs` to check the current JSON catalog, or `node --test tests/*.test.mjs` to run the entire optional developer regression suite. For producing a new ZIP release with a synchronized offline fallback, run `python tools/sync-lessons.py`; **that sync is not needed for normal GitHub lesson edits**.

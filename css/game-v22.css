@@ -218,3 +218,9 @@ html{scroll-behavior:smooth}body{background:#f4f7fa;color:var(--game-ink)}
 .mix-volume-control small{font-size:10px;color:#75848d;line-height:1.3}
 .audio-mix-settings .mix-sliders{margin-top:14px}
 @media(max-width:650px){.highway-key .piano-mini-legend{width:100%;justify-content:flex-end}.mix-sliders{grid-template-columns:1fr}.audio-mix-settings .mix-sliders{grid-template-columns:1fr}}
+
+/* v2.8 finger guidance displayed between beat controls and notes */
+.hand-coach{display:flex;align-items:center;gap:9px;padding:7px 13px;margin:0;border:1px solid #bfe3db;border-radius:10px;background:#eaf7f2;color:#215f54;font-size:12px;line-height:1.4;font-weight:650}
+.hand-coach-icon{font-size:15px;flex-shrink:0}
+.hand-coach[hidden]{display:none!important}
+.catalog-warning{background:#fff3e6!important;color:#803f16!important}

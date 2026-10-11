@@ -10,16 +10,17 @@ const main=text('js/main.js');
 const embedded=html.match(/<script type="application\/json" id="embedded-lessons">([\s\S]*?)<\/script>/)?.[1];
 const options=html.match(/<select id="lesson-select"[^>]*>([\s\S]*?)<\/select>/)?.[1];
 
-test('the distributed page embeds the complete twenty-lesson catalog',()=>{
+test('the distributed page embeds the complete fifty-lesson catalog',()=>{
   assert.ok(embedded,'Missing embedded catalog');
   const actual=JSON.parse(embedded);
-  assert.equal(actual.length,20);
-  assert.deepEqual(actual,source);
+  assert.equal(actual.length,50);
+  assert.ok(source.length>=50);
+  assert.deepEqual(actual,source.slice(0,50));
 });
-test('the selector includes all 20 lessons even if JavaScript fails to boot',()=>{
+test('the selector includes all 50 lessons even if JavaScript fails to boot',()=>{
   assert.ok(options);
-  assert.equal((options.match(/<option\b/g)||[]).length,20);
-  for(const lesson of source)assert.ok(options.includes(`value="${lesson.id}"`),lesson.id);
+  assert.equal((options.match(/<option\b/g)||[]).length,50);
+  for(const lesson of source.slice(0,50))assert.ok(options.includes(`value="${lesson.id}"`),lesson.id);
 });
 test('melody controls are visible and functional in the shipped page',()=>{
   assert.match(html, /id="melody-button"/);
@@ -28,15 +29,15 @@ test('melody controls are visible and functional in the shipped page',()=>{
   assert.match(main,/melodyButton\.addEventListener\('click',hearWholeMelody\)/);
   assert.match(main,/melodyStop\.addEventListener\('click'/);
 });
-test('version labels and cache busters all identify 2.7',()=>{
-  assert.match(html,/CLEO EDITION · v2\.7/);
-  assert.match(html, /main\.js\?v=2\.7/);
-  assert.match(html,/styles\.css\?v=2\.7/);
+test('version labels and cache busters all identify 2.8',()=>{
+  assert.match(html,/CLEO EDITION · v2\.8/);
+  assert.match(html, /main\.js\?v=2\.8/);
+  assert.match(html,/styles\.css\?v=2\.8/);
   assert.doesNotMatch(main, /v=1\.8\.1/);
   assert.match(main,/embedded-lessons/);
 });
-test('the version can initialize without a fetch request for lessons.json',()=>{
-  assert.doesNotMatch(main,/fetch\(['"]\.\/lessons\/lessons\.json/);
+test('the version supports JSON-first loading with an embedded fallback',()=>{
+  assert.match(main,/loadLessonCatalog/);
   assert.match(main,/void refreshMicrophones\(\)/);
 });
 
@@ -47,5 +48,5 @@ test('all chord controls and modules are deployed with twenty lessons',()=>{
   assert.match(html,/id="chord-progress"/);
   assert.match(main,/spectralNotes/);
   assert.match(main,/onMidiMessage/);
-  assert.match(main,/catalog\.length!==20/);
+  assert.match(main,/loadLessonCatalog\(\{fallback\}\)/);
 });

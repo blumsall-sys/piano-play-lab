@@ -6,9 +6,9 @@ import {midiToFrequency} from '../js/music.js';
 import {buildMelodyTimeline} from '../js/melody.js';
 import {spectralNotes,ChordFrameStabilizer} from '../js/chord-audio.js';
 const lessons=JSON.parse(readFileSync(new URL('../lessons/lessons.json',import.meta.url),'utf8'));
-test('Twenty lessons with eleven chord lessons and all notes within toy piano',()=>{
- assert.equal(validateLessons(lessons).length,20);
- assert.equal(lessons.filter(l=>l.notes.some(Array.isArray)).length,11);
+test('Fifty lessons with twenty-one chord and two-hand lessons and all notes within toy piano',()=>{
+ assert.ok(validateLessons(lessons).length>=50);
+ assert.ok(lessons.filter(l=>l.notes.some(Array.isArray)).length>=21);
  for(const lesson of lessons)for(const ev of lesson.notes)for(const n of eventNotes(ev))assert.ok(n>=53&&n<=77);
 });
 test('A chord is not complete until all three different correct notes are played',()=>{

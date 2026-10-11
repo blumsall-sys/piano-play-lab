@@ -7,7 +7,7 @@ import {buildMelodyTimeline} from '../js/melody.js';
 const lessons = JSON.parse(readFileSync(new URL('../lessons/lessons.json',import.meta.url),'utf8'));
 const newIDs=['twinkle-twinkle','wheels-on-bus','puppy-rescue','ice-cream-truck','mary-lamb'];
 test('Five new melody lessons included alongside original four',()=>{
-  assert.equal(validateLessons(lessons).length,20);
+  assert.ok(validateLessons(lessons).length>=50);
   assert.deepEqual(lessons.slice(4,9).map(l=>l.id),newIDs);
   for(const l of lessons.slice(4,9)){
     assert.ok(l.spokenInstructions.length>60);

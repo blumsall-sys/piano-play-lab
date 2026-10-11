@@ -92,6 +92,9 @@ export class GameUI{
     play.append(lesson,highwayBox,rhythm,piano);
     // Narration is the first button in the main teaching row, not a distant header button.
     piano.querySelector('.controls-row').prepend(play.querySelector('#game-narrate'));
+    const practiceConnect=create('button','btn btn-primary midi-practice-connect','🔌 Connect USB MIDI');
+    practiceConnect.id='midi-practice-connect';practiceConnect.type='button';practiceConnect.hidden=true;
+    piano.querySelector('.controls-row').insertBefore(practiceConnect,piano.querySelector('#demo-button'));
     play.insertBefore(lesson,play.querySelector('.highway-title'));
     const settings=create('section','game-page settings-page',`<div class="page-title"><span class="overline">MAKE IT YOUR OWN</span><h1>Settings & helpers</h1><p>Keep the game simple. Set up the microphone, lesson voice, piano calibration and chord options here.</p></div><section class="setting-intro panel"><label class="rhythm-toggle"><input id="unlock-all-lessons" type="checkbox"> Unlock all lessons for testing</label><p class="subtle">Turn this on if you're testing advanced lessons before completing the earlier ones. Progress is still recorded normally.</p></section>`);
     settings.id='screen-settings';
@@ -103,6 +106,10 @@ export class GameUI{
       <div class="midi-setup-options" id="midi-setup-options" hidden>
         <p class="subtle">Connect the M-Audio with USB. It sends MIDI data, not audio. Use Chrome on Windows first; Web MIDI may not be available on every Android tablet.</p>
         <div class="midi-connect-slot"></div>
+        <div class="midi-connection-tools"><button class="btn btn-secondary" id="midi-rescan" type="button">↻ Scan / reconnect</button><span id="midi-connection-state" class="midi-connection-state" role="status" aria-live="polite">Not connected · grant MIDI permission</span></div>
+        <p id="midi-browser-diagnostics" class="subtle">MIDI browser check pending.</p>
+        <p class="subtle">No connection? <a href="./midi-test.html" target="_blank" rel="noopener">Open the independent MIDI connection test</a> to check Chrome and the USB keyboard.</p>
+        <p id="midi-last-event" class="midi-last-event" role="status" aria-live="polite">No MIDI messages received. Connect, then press a physical key.</p>
         <label class="instrument-field" for="midi-input-device">MIDI input device<select id="midi-input-device"><option value="">Auto-select M-Audio</option></select></label>
         <div class="midi-key-check"><button type="button" class="btn btn-secondary" id="midi-learn-first-c">Identify leftmost C key</button>
           <label class="instrument-field" for="midi-first-c">Display starts at <select id="midi-first-c">

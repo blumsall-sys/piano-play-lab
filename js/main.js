@@ -1,18 +1,18 @@
-import {GameUI,restoreActive} from './game-ui.js?v=2.5';
-import {Keyboard} from './keyboard.js?v=2.5';
-import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.5';
-import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.5';
-import {LessonEngine,eventNotes} from './lesson.js?v=2.5';
-import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=2.5';
-import {soundNote,soundChime,soundCelebration,soundMelody,midiSoundOn,midiSoundOff,midiSoundAllOff,prepareMidiAudio} from './sound.js?v=2.5';
-import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=2.5';
-import {VoiceGuide} from './voice-guide.js?v=2.5';
-import {spectralNotes} from './chord-audio.js?v=2.5';
-import {RhythmSession,eventTimeline,lessonBeats} from './rhythm.js?v=2.5';
-import {Metronome} from './metronome.js?v=2.5';
-import {LoopPractice} from './loop-practice.js?v=2.5';
-import {buildScoreStrip} from './score-strip.js?v=2.5';
-import {loadHistory,saveSession,exportHistory,updateSessionRhythm} from './progress-store.js?v=2.5';
+import {GameUI,restoreActive} from './game-ui.js?v=2.6';
+import {Keyboard} from './keyboard.js?v=2.6';
+import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.6';
+import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.6';
+import {LessonEngine,eventNotes} from './lesson.js?v=2.6';
+import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=2.6';
+import {soundNote,soundChime,soundCelebration,soundMelody,midiSoundOn,midiSoundOff,midiSoundAllOff,prepareMidiAudio} from './sound.js?v=2.6';
+import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=2.6';
+import {VoiceGuide} from './voice-guide.js?v=2.6';
+import {spectralNotes} from './chord-audio.js?v=2.6';
+import {RhythmSession,eventTimeline,lessonBeats} from './rhythm.js?v=2.6';
+import {Metronome} from './metronome.js?v=2.6';
+import {LoopPractice} from './loop-practice.js?v=2.6';
+import {buildScoreStrip} from './score-strip.js?v=2.6';
+import {loadHistory,saveSession,exportHistory,updateSessionRhythm} from './progress-store.js?v=2.6';
 
 const $=id=>document.getElementById(id);
 const elements={
@@ -40,6 +40,7 @@ let keyboard;
 let voice;
 let cameraStream=null;
 let midiAccess=null;let midiHeld=new Set();let midiHandlers=new Map();let lastMidiAt=0;let midiOnsets=new Map();let midiChordHolds=new Map();
+let midiConnectBusy=false;let midiPortWarning='';let midiPermissionStatus='unknown';
 const INSTRUMENT_STORAGE_KEY='cleos-piano-instrument-v2.4';
 let selectedLayout=HAPE,midiFirstC=48, selectedMidiDevice='', midiAudioEnabled=true,midiLearningC=false;
 let instrumentControls=null;
@@ -53,6 +54,33 @@ try{
 function saveInstrument(){try{localStorage.setItem(INSTRUMENT_STORAGE_KEY,JSON.stringify({layout:selectedLayout,firstC:midiFirstC,device:selectedMidiDevice,audio:midiAudioEnabled}));}catch{}}
 function displayProfile(){return profileFor(selectedLayout,midiFirstC);}
 function setMidiActivity(text){if(instrumentControls)instrumentControls.status.textContent=text;}
+function midiDevices(){return midiAccess?[...midiAccess.inputs.values()].filter(input=>input.state!=='disconnected'):[];}
+function midiReady(){return midiDevices().some(input=>input.connection==='open');}
+function midiBrowserCheck(){
+  if(!window.isSecureContext)return 'Blocked: MIDI requires HTTPS or http://localhost (not a LAN HTTP address).';
+  if(typeof navigator.requestMIDIAccess!=='function')return 'Web MIDI unavailable in this browser. Test in current Chrome or Edge.';
+  if(midiPermissionStatus==='denied')return 'MIDI permission BLOCKED. Chrome site icon → Site settings → MIDI devices → Allow, then reconnect.';
+  return `Web MIDI available · permission ${midiPermissionStatus} · ${midiDevices().length} device(s) detected`;
+}
+function updateMidiConnectionUI(message=''){
+  const devices=midiDevices();
+  const connected=midiReady();
+  const state=$('midi-connection-state'),diagnostic=$('midi-browser-diagnostics'),practice=$('midi-practice-connect');
+  const connect=$('midi-button'),rescan=$('midi-rescan');
+  if(state){state.textContent=message||(midiConnectBusy?'Connecting / requesting MIDI permission…':connected?`Ready · ${devices.length} MIDI input(s) available`:midiAccess?'MIDI permission granted, but no open keyboard input':'Not connected · click Connect and allow MIDI access');state.classList.toggle('midi-ready',connected);}
+  if(diagnostic)diagnostic.textContent=midiBrowserCheck()+(midiPortWarning?` · ${midiPortWarning}`:'');
+  if(practice){practice.hidden=selectedLayout!==MAUDIO;practice.textContent=connected?'✓ MIDI connected · Reconnect':'🔌 Connect USB MIDI';practice.disabled=midiConnectBusy;}
+  if(connect){connect.textContent=midiConnectBusy?'Connecting…':connected?'✓ Connected · Reconnect MIDI':'🔌 Connect USB MIDI keyboard';connect.disabled=midiConnectBusy;}
+  if(rescan)rescan.disabled=midiConnectBusy;
+  const activity=$('piano-input-status');
+  if(activity&&selectedLayout===MAUDIO)activity.textContent=connected?'USB MIDI ready · press any key':midiAccess?'MIDI permission granted · keyboard not open':'USB MIDI not connected · tap Connect USB MIDI';
+}
+async function refreshMidiPermission(){
+  midiPermissionStatus='unknown';
+  if(!navigator.permissions?.query)return;
+  try{const result=await navigator.permissions.query({name:'midi',sysex:false});midiPermissionStatus=result.state;result.onchange=()=>{midiPermissionStatus=result.state;updateMidiConnectionUI();};}catch{}
+  updateMidiConnectionUI();
+}
 function setInstrumentLayout(layout,{save=true}={}){
   selectedLayout=layout===MAUDIO?MAUDIO:HAPE;
   midiLearningC=false;
@@ -74,7 +102,7 @@ function setInstrumentLayout(layout,{save=true}={}){
     const missing=engine.lesson.notes.flatMap(eventNotes).filter(n=>n<profile.first||n>profile.last);
     if(missing.length)setMidiActivity(`Octave warning: ${[...new Set(missing)].map(noteText).join(', ')} cannot be played at ${midiToName(profile.first)}–${midiToName(profile.last)}. Use the hardware octave buttons until they fit, then Identify leftmost C.`);
   }
-  updateMicButton();
+  updateMicButton();updateMidiConnectionUI();
   if(save)saveInstrument();
 }
 function setupInstrumentUI(){
@@ -84,7 +112,7 @@ function setupInstrumentUI(){
   };
   instrumentControls.layout.addEventListener('change',()=>{
     setInstrumentLayout(instrumentControls.layout.value);
-    if(selectedLayout===MAUDIO){setMidiActivity('M-Audio mode selected. Connect your USB MIDI keyboard below, then press its leftmost C.');}
+    if(selectedLayout===MAUDIO){setMidiActivity('M-Audio selected. Approve the browser MIDI permission request, then press any key.');void connectMidi();}
   });
   instrumentControls.firstC.addEventListener('change',()=>{
     midiFirstC=Number(instrumentControls.firstC.value);midiLearningC=false;
@@ -98,11 +126,12 @@ function setupInstrumentUI(){
   });
   instrumentControls.device.addEventListener('change',()=>{
     selectedMidiDevice=instrumentControls.device.value;saveInstrument();midiSoundAllOff();
-    setMidiActivity('Selected MIDI input updated. Play one key to confirm.');
+    setMidiActivity('Input selected. Press a real key; the last MIDI event should appear below.');updateMidiConnectionUI();
   });
   instrumentControls.audio.addEventListener('change',()=>{midiAudioEnabled=instrumentControls.audio.checked;saveInstrument();if(!midiAudioEnabled)midiSoundAllOff();});
   setInstrumentLayout(selectedLayout,{save:false});
-  if(!navigator.requestMIDIAccess&&selectedLayout===MAUDIO)setMidiActivity('Web MIDI is unavailable in this browser. Try Chrome on Windows, using HTTPS or localhost.');
+  if(!navigator.requestMIDIAccess&&selectedLayout===MAUDIO)setMidiActivity('Web MIDI unavailable. Test Chrome or Edge on localhost / HTTPS.');
+  void refreshMidiPermission();updateMidiConnectionUI();
 }
 
 let suppressUntil=0;
@@ -895,32 +924,70 @@ function moveToNextLesson(){
   gameUI?.show('play');
 }
 async function connectMidi(){
-  // Open the audio engine while the click still counts as a user gesture.
-  if(midiAudioEnabled)void prepareMidiAudio().catch(console.warn);
-  if(!navigator.requestMIDIAccess){elements.midiStatus.textContent='Web MIDI unavailable: try Chrome on Windows via localhost or HTTPS.';setMidiActivity('This device/browser does not expose Web MIDI. Use Chrome on Windows or compatible Android Chrome.');return;}
+  if(midiConnectBusy)return;
+  if(selectedLayout!==MAUDIO){setMidiActivity('Select M-Audio under Keyboard layout first.');return;}
+  midiConnectBusy=true;midiPortWarning='';updateMidiConnectionUI('Requesting access to USB MIDI…');
   try{
-    if(!midiAccess){midiAccess=await navigator.requestMIDIAccess({sysex:false});midiAccess.addEventListener('statechange',bindMidiInputs);}
-    bindMidiInputs();
-  }catch(error){elements.midiStatus.textContent='Could not connect MIDI: '+error.message;setMidiActivity('MIDI error: '+error.message);}
-}
-function bindMidiInputs(){
-  if(!midiAccess)return;
-  for(const input of midiAccess.inputs.values()){
-    if(midiHandlers.has(input.id))continue;
-    input.addEventListener('midimessage',onMidiMessage);
-    midiHandlers.set(input.id,input);
+    if(!window.isSecureContext)throw Object.assign(new Error('MIDI requires http://localhost or HTTPS. A normal HTTP LAN address is not secure.'),{name:'SecurityError'});
+    if(typeof navigator.requestMIDIAccess!=='function')throw Object.assign(new Error('Web MIDI is not supported here. Try Chrome or Edge on Windows.'),{name:'NotSupportedError'});
+    // This action is deliberately run from a click / keyboard-layout change, so Chrome can ask permission.
+    if(midiAudioEnabled)void prepareMidiAudio().catch(console.warn);
+    if(!midiAccess){
+      midiAccess=await navigator.requestMIDIAccess({sysex:false});
+      midiAccess.addEventListener('statechange',()=>{void bindMidiInputs();});
+    }
+    midiPermissionStatus='granted';
+    await bindMidiInputs();
+    if(!midiDevices().length){
+      setMidiActivity('MIDI access allowed, but 0 keyboards found. Check USB power/cable and Windows Device Manager; click Scan / reconnect after plugging in.');
+    } else if(!midiReady()){
+      setMidiActivity('MIDI device found but port not open. Close other programs using MIDI and click Scan / reconnect.');
+    } else {
+      setMidiActivity(`Connected: ${midiDevices().map(d=>d.name||'USB MIDI').join(', ')}. Press any key now; check Last MIDI event below.`);
+    }
+  }catch(error){
+    const denied=error?.name==='NotAllowedError'||error?.name==='SecurityError';
+    if(denied)midiPermissionStatus='denied';
+    const reason=error?.name==='NotAllowedError'||error?.name==='SecurityError'
+      ?'MIDI access denied or blocked. In Chrome, open the site icon → Site settings → MIDI devices → Allow, then click Connect again.'
+      :`${error?.name||'Error'}: ${error?.message||String(error)}`;
+    elements.midiStatus.textContent=reason;
+    setMidiActivity(reason);
+    midiPortWarning=reason;
+  }finally{
+    midiConnectBusy=false;
+    updateMidiConnectionUI();
+    void refreshMidiPermission();
   }
-  const devices=[...midiAccess.inputs.values()].filter(d=>d.state!=='disconnected');
-  updateMicButton();
-  elements.midiStatus.textContent=devices.length?'MIDI inputs: '+devices.map(d=>d.name).join(', '):'No USB MIDI keyboard detected. Check its USB cable.';
+}
+async function bindMidiInputs(){
+  if(!midiAccess)return;
+  const devices=midiDevices();
+  const active=new Map(devices.map(input=>[input.id,input]));
+  // Avoid stale listeners when a controller is unplugged and later reattached with the same port ID.
+  for(const [id,old] of midiHandlers){
+    if(active.get(id)!==old){old.removeEventListener('midimessage',onMidiMessage);midiHandlers.delete(id);}
+  }
+  const errors=[];
+  for(const input of devices){
+    if(midiHandlers.get(input.id)!==input){
+      input.addEventListener('midimessage',onMidiMessage);
+      midiHandlers.set(input.id,input);
+    }
+    if(input.connection!=='open'&&typeof input.open==='function'){
+      try{await input.open();}catch(error){errors.push(`${input.name||'MIDI device'}: ${error.message}`);}
+    }
+  }
+  midiPortWarning=errors.join('; ');
+  if(selectedMidiDevice&&!active.has(selectedMidiDevice)){selectedMidiDevice='';saveInstrument();}
   if(instrumentControls){
     const select=instrumentControls.device;
     select.replaceChildren(new Option('Auto-select M-Audio',''));
-    for(const input of devices)select.add(new Option(input.name||'USB MIDI device',input.id));
-    if(selectedMidiDevice&&devices.some(d=>d.id===selectedMidiDevice))select.value=selectedMidiDevice;
-    else if(selectedMidiDevice){selectedMidiDevice='';saveInstrument();}
-    setMidiActivity(devices.length?`Connected: ${devices.map(d=>d.name).join(', ')}. Press the leftmost C key to check its octave.`:'Waiting for MIDI controller. Plug it in, then tap Connect USB MIDI keyboard.');
+    for(const input of devices)select.add(new Option(`${input.name||'USB MIDI device'} (${input.connection})`,input.id));
+    select.value=selectedMidiDevice||'';
   }
+  elements.midiStatus.textContent=devices.length?`MIDI inputs: ${devices.map(d=>`${d.name||'Unnamed'} (${d.connection})`).join(', ')}`:'No MIDI input found after permission approval. Check USB cable / Device Manager.';
+  updateMicButton();updateMidiConnectionUI();
 }
 function onMidiMessage(event){
   const parsed=midiMessage(event.data);
@@ -928,6 +995,9 @@ function onMidiMessage(event){
   const {type,note,velocity}=parsed;
   const sourceId=event.currentTarget?.id||event.target?.id||'';
   if(selectedMidiDevice&&sourceId&&sourceId!==selectedMidiDevice)return;
+  const raw=$('midi-last-event');
+  if(raw){raw.textContent=`Last MIDI event: ${noteText(note)} · MIDI ${note} · ${type==='on'?'PRESS':'RELEASE'} · velocity ${velocity} · ${new Date().toLocaleTimeString()}`;raw.classList.add('midi-ready');}
+  updateMidiConnectionUI();
   if(selectedLayout!==MAUDIO)return;
   if(type==='off'){
     midiSoundOff(note);
@@ -1041,13 +1111,18 @@ async function boot(){
       onNarrate:()=>elements.voiceRead.click()
     });
     setupInstrumentUI();
+    const midiPractice=$('midi-practice-connect');
+    if(midiPractice)midiPractice.addEventListener('click',connectMidi);
+    const midiRescan=$('midi-rescan');
+    if(midiRescan)midiRescan.addEventListener('click',connectMidi);
+    updateMidiConnectionUI();
     elements.lesson.replaceChildren();
     engine.lessons.forEach((lesson,i)=>{
       const option=document.createElement('option');option.value=lesson.id;option.textContent=`${i+1} · ${lesson.title}`;
       elements.lesson.append(option);
     });
     elements.lesson.value=engine.lesson.id;
-    elements.releaseStatus.textContent=`v2.5 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord lessons`;
+    elements.releaseStatus.textContent=`v2.6 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord lessons`;
     syncRhythmLesson();
     buildHistoryUI();
     render();

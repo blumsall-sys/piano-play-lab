@@ -1,6 +1,8 @@
-# Cleo's Piano Play Lab v2.5
+# Cleo's Piano Play Lab v2.6
 
-**NEW: Three-Try Rhythm Highway.** In Practice → Perform, leave **3 tries · 1-bar breaks** enabled and press **Start with 4-beat count-in**. The melody scrolls up to three times, with four empty beats between attempts. Results list the accuracy for every try. See [`REPEAT_CHALLENGE_v2.5.md`](REPEAT_CHALLENGE_v2.5.md).
+**NEW in v2.6: USB MIDI connection repair.** Selecting M-Audio now requests access, and Settings and Practice both offer Connect/Reconnect controls. See `MIDI_TROUBLESHOOTING_v2.6.md` and the independent `midi-test.html` page.
+
+**v2.5: Three-Try Rhythm Highway.** In Practice → Perform, leave **3 tries · 1-bar breaks** enabled and press **Start with 4-beat count-in**. The melody scrolls up to three times, with four empty beats between attempts. Results list the accuracy for every try. See [`REPEAT_CHALLENGE_v2.5.md`](REPEAT_CHALLENGE_v2.5.md).
 
 # Cleo's Piano Play Lab v2.4
 

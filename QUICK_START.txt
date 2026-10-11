@@ -10,3 +10,5 @@ All 20 lessons, Rhythm Highway and voice guide remain.
 See M_AUDIO_SETUP_v2.4.md and DEPLOY_GITHUB_PAGES_v2.4.md for details.
 
 NEW: Practice > Perform > check 3 tries · 1-bar breaks, then press Start with 4-beat count-in. See REPEAT_CHALLENGE_v2.5.md.
+
+M-AUDIO v2.6: On Windows Chrome, Settings > M-Audio > allow MIDI permission > Connect USB MIDI > press a key. If missing, use http://localhost:8000/midi-test.html and see MIDI_TROUBLESHOOTING_v2.6.md. Selecting a keyboard layout alone does not guarantee that the USB port is available.

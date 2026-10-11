@@ -183,3 +183,12 @@ html{scroll-behavior:smooth}body{background:#f4f7fa;color:var(--game-ink)}
 .loop-result-row{padding:9px 8px;border-bottom:1px solid #d7e8e3;font-weight:650;font-size:13px}
 .loop-result-row:last-child{border:0}.loop-result-row.passed{color:#167a63;background:#e5f9ef;border-radius:8px}
 @media(max-width:700px){.rhythm-loop-status{width:100%;justify-content:center}}
+/* v2.6 MIDI discovery and connection debugging */
+.midi-connection-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+.midi-connection-state{font-size:13px;font-weight:750;color:#9c4139;background:#fff1ee;border-radius:9px;padding:10px 12px}
+.midi-connection-state.midi-ready{color:#126a4b;background:#dff5e9}
+.midi-last-event{font-size:13px;font-weight:700;background:#f5f6fa;border:1px dashed #b7c3d0;padding:12px;border-radius:10px;color:#44566b}
+.midi-last-event.midi-ready{background:#e7fbf3;border-color:#7fceb2;color:#176e54}
+.midi-practice-connect:not([hidden]){display:inline-flex;align-items:center;justify-content:center}
+.midi-practice-connect[hidden]{display:none!important}
+@media(max-width:650px){.midi-connection-tools button{width:100%}}

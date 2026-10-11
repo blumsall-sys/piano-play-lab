@@ -27,20 +27,33 @@ export function gradeHold(actualMs,expectedMs){
 export class RhythmSession{
   constructor(lesson,bpm,multiplier=1,countIn=4){
     this.lesson=lesson;this.timeline=eventTimeline(lesson,bpm,multiplier);this.countIn=countIn;
-    this.anchorMs=null;this.grades=new Map();this.holds=new Map();
+    this.anchorMs=null;this.grades=new Map();this.holds=new Map();this.loopPractice=null;
   }
   start(nowMs){this.anchorMs=nowMs+this.countIn*this.timeline.beatMs;return this.anchorMs;}
   isCountingIn(nowMs){return this.anchorMs!==null&&nowMs<this.anchorMs;}
   observe(index,onsetMs,source){
-    if(this.anchorMs===null||this.grades.has(index)||!this.timeline.events[index])return null;
-    const target=this.anchorMs+this.timeline.events[index].onsetMs;
-    const result={index,source,...gradeTiming(onsetMs-target,this.timeline.beatMs),onsetMs:Math.round(onsetMs),targetMs:Math.round(target)};
-    this.grades.set(index,result);return result;
+    if(this.anchorMs===null||!this.timeline.events[index])return null;
+    const pass=this.loopPractice?.passIndex??0;
+    const key=`${pass}:${index}`;if(this.grades.has(key))return null;
+    const offset=(this.loopPractice?.startBeat(pass)??0)*this.timeline.beatMs;
+    const target=this.anchorMs+offset+this.timeline.events[index].onsetMs;
+    const result={index,pass,source,...gradeTiming(onsetMs-target,this.timeline.beatMs),onsetMs:Math.round(onsetMs),targetMs:Math.round(target)};
+    this.grades.set(key,result);return result;
+  }
+  reportPass(pass){
+    const values=[...this.grades.values()].filter(x=>x.pass===pass);
+    const holds=[...this.holds.values()].filter(x=>x.pass===pass);
+    return {assessed:values.length,onTime:values.filter(x=>x.onTime).length,
+      early:values.filter(x=>x.label==='early').length,late:values.filter(x=>x.label==='late').length,
+      timingAccuracy:values.length?Math.round(1000*values.filter(x=>x.onTime).length/values.length)/10:null,
+      holdsMeasured:holds.length,holdsGood:holds.filter(x=>x.label==='good').length,
+      events:values,holds};
   }
   recordHold(index,actualMs,source){
     if(!this.timeline.events[index]||!['midi','screen'].includes(source))return null;
-    const result={index,source,...gradeHold(actualMs,this.timeline.events[index].durationMs)};
-    this.holds.set(index,result);return result;
+    const pass=this.loopPractice?.passIndex??0;
+    const result={index,pass,source,...gradeHold(actualMs,this.timeline.events[index].durationMs)};
+    this.holds.set(`${pass}:${index}`,result);return result;
   }
   report(){
     const values=[...this.grades.values()];

@@ -20,7 +20,7 @@ export function unlockedThrough(lessons,history,unlockAll=false){
   if(unlockAll)return lessons.length;
   let count=1;
   for(let i=0;i<lessons.length-1;i++){
-    if(history.some(h=>h.lessonId===lessons[i].id&&h.keyAccuracy>=PASS))count++;
+    if(history.some(h=>h.lessonId===lessons[i].id&&h.keyAccuracy>=PASS&&h.loopPassed!==false))count++;
     else break;
   }
   return count;
@@ -148,7 +148,7 @@ export class GameUI{
     if(this.engine.position>0&&!this.engine.state().done){this.show('play');return;}
     const lessons=this.engine.lessons,history=loadHistory();
     const index=Math.min(unlockedThrough(lessons,history,this.settings.unlockAll)-1,lessons.length-1);
-    let candidate=lessons.findIndex(lesson=>!history.some(h=>h.lessonId===lesson.id&&h.keyAccuracy>=PASS));
+    let candidate=lessons.findIndex(lesson=>!history.some(h=>h.lessonId===lesson.id&&h.keyAccuracy>=PASS&&h.loopPassed!==false));
     if(candidate<0)candidate=index;
     candidate=Math.min(candidate,index);
     this.chooseLesson(lessons[candidate].id);this.show('play');
@@ -181,10 +181,12 @@ export class GameUI{
     if(index>=max)return;
     this.chooseLesson(this.engine.lessons[index].id);this.show('play');
   }
-  onComplete(){
-    const state=this.engine.state(),passed=state.summary.accuracy>=PASS;
-    $('result-stars').textContent=state.summary.accuracy>=95?'★★★':state.summary.accuracy>=80?'★★☆':passed?'★☆☆':'☆☆☆';
-    $('result-pass-message').textContent=passed?'Lesson passed! The next adventure is unlocked.':'Nice effort! Try again to reach 70% accuracy and unlock the next lesson.';
+  onComplete(passedOverride=null){
+    const state=this.engine.state(),passed=passedOverride===null?state.summary.accuracy>=PASS:passedOverride;
+    $('result-stars').textContent=!passed?'☆☆☆':state.summary.accuracy>=95?'★★★':state.summary.accuracy>=80?'★★☆':'★☆☆';
+    this.results.querySelector('.result-heading h1').textContent=passed?'Wonderful playing, Cleo! ✨': 'Three tries complete, Cleo! Keep practicing!';
+    $('results-title').textContent=passed?'Congratulations! 🎉':'Your practice results';
+    $('result-pass-message').textContent=passed?'Lesson passed! The next adventure is unlocked.':passedOverride===false?'Three tries completed. No full in-time melody yet. Restart and try again!':'Nice effort! Try again to reach 70% accuracy and unlock the next lesson.';
     $('result-next').disabled=!passed||!state.nextLessonId;
     this.updateMap();this.show('results');
   }

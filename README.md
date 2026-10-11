@@ -1,3 +1,7 @@
+# Cleo's Piano Play Lab v2.5
+
+**NEW: Three-Try Rhythm Highway.** In Practice → Perform, leave **3 tries · 1-bar breaks** enabled and press **Start with 4-beat count-in**. The melody scrolls up to three times, with four empty beats between attempts. Results list the accuracy for every try. See [`REPEAT_CHALLENGE_v2.5.md`](REPEAT_CHALLENGE_v2.5.md).
+
 # Cleo's Piano Play Lab v2.4
 
 **New in v2.4:** Dual keyboard layouts. Hape Toy Piano (25 keys, F3–F5, microphone) is the default. Select M-Audio Keystation Mini 32 MK3 (32 keys, C–G, USB MIDI) in Settings. Also includes a voice instruction button in the piano row, red/green microphone status, USB MIDI note sound and first-C key mapping.

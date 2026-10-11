@@ -1,17 +1,18 @@
-import {GameUI,restoreActive} from './game-ui.js?v=2.4';
-import {Keyboard} from './keyboard.js?v=2.4';
-import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.4';
-import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.4';
-import {LessonEngine,eventNotes} from './lesson.js?v=2.4';
-import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=2.4';
-import {soundNote,soundChime,soundCelebration,soundMelody,midiSoundOn,midiSoundOff,midiSoundAllOff,prepareMidiAudio} from './sound.js?v=2.4';
-import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=2.4';
-import {VoiceGuide} from './voice-guide.js?v=2.4';
-import {spectralNotes} from './chord-audio.js?v=2.4';
-import {RhythmSession,eventTimeline,lessonBeats} from './rhythm.js?v=2.4';
-import {Metronome} from './metronome.js?v=2.4';
-import {buildScoreStrip} from './score-strip.js?v=2.4';
-import {loadHistory,saveSession,exportHistory,updateSessionRhythm} from './progress-store.js?v=2.4';
+import {GameUI,restoreActive} from './game-ui.js?v=2.5';
+import {Keyboard} from './keyboard.js?v=2.5';
+import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.5';
+import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.5';
+import {LessonEngine,eventNotes} from './lesson.js?v=2.5';
+import {MIN_MIDI,MAX_MIDI,midiToName,midiToFrequency} from './music.js?v=2.5';
+import {soundNote,soundChime,soundCelebration,soundMelody,midiSoundOn,midiSoundOff,midiSoundAllOff,prepareMidiAudio} from './sound.js?v=2.5';
+import {evaluateReference,compareReferences,centsBetween} from './calibration.js?v=2.5';
+import {VoiceGuide} from './voice-guide.js?v=2.5';
+import {spectralNotes} from './chord-audio.js?v=2.5';
+import {RhythmSession,eventTimeline,lessonBeats} from './rhythm.js?v=2.5';
+import {Metronome} from './metronome.js?v=2.5';
+import {LoopPractice} from './loop-practice.js?v=2.5';
+import {buildScoreStrip} from './score-strip.js?v=2.5';
+import {loadHistory,saveSession,exportHistory,updateSessionRhythm} from './progress-store.js?v=2.5';
 
 const $=id=>document.getElementById(id);
 const elements={
@@ -29,7 +30,7 @@ const elements={
   melodyButton:$('melody-button'),melodyStop:$('melody-stop'),melodyMessage:$('melody-message'),releaseStatus:$('release-status'),
   chordMode:$('chord-mode'),chordHelp:$('chord-help'),chordProgress:$('chord-progress'),midiButton:$('midi-button'),midiStatus:$('midi-status'),chordTest:$('chord-self-test'),
   rhythmGrade:$('rhythm-grade'),metronomeAudible:$('metronome-audible'),rhythmBpm:$('rhythm-bpm'),rhythmSpeed:$('rhythm-speed'),micTimingOffset:$('mic-timing-offset'),
-  rhythmStart:$('rhythm-start'),rhythmStop:$('rhythm-stop'),rhythmBeat:$('rhythm-beat'),rhythmTempo:$('rhythm-tempo'),rhythmFeedback:$('rhythm-feedback'),scoreStrip:$('score-strip'),
+  rhythmStart:$('rhythm-start'),rhythmStop:$('rhythm-stop'),rhythmBeat:$('rhythm-beat'),rhythmLoop:$('rhythm-loop'),rhythmLoopStatus:$('rhythm-loop-status'),rhythmTempo:$('rhythm-tempo'),rhythmFeedback:$('rhythm-feedback'),scoreStrip:$('score-strip'),
   resultTiming:$('result-timing'),resultHolds:$('result-holds'),historyList:$('history-list'),historyExport:$('history-export')
 };
 let gameUI=null;
@@ -116,6 +117,9 @@ let previewEpoch=0;
 let chordModeCache='';
 let rhythmSession=null;
 let metronome=null;
+let loopPractice=null;
+let loopTimer=null;
+let loopPassOverride=null;
 let completedSaved=false;
 let attemptLog=[];
 let currentSessionId='';
@@ -153,20 +157,69 @@ function updateTempoHUD(){
   elements.rhythmTempo.textContent=`${Math.round(selectedBpm()*selectedMultiplier()*10)/10} BPM (${selectedBpm()} × ${selectedMultiplier()})`;
 }
 function stopRhythm({message=true}={}){
-  metronome?.stop();metronome=null;rhythmSession=null;
+  if(loopTimer!==null){clearInterval(loopTimer);loopTimer=null;}
+  metronome?.stop();metronome=null;rhythmSession=null;loopPractice=null;
+  elements.rhythmLoopStatus.textContent=elements.rhythmLoop.checked?'3 tries · 1 bar between':'Repeat challenge off';
   elements.rhythmStart.disabled=false;elements.rhythmStop.disabled=true;
   elements.rhythmBeat.textContent='Beat stopped';
   elements.scoreStrip?.querySelectorAll('.beat-now').forEach(n=>n.classList.remove('beat-now'));
   if(message)elements.rhythmFeedback.textContent='Timing paused. Start a fresh count-in when ready.';
 }
 function onMetronomeBeat(beat){
-  elements.rhythmBeat.textContent=beat<0?`Count-in: ${-beat}`:`Beat ${beat+1} · ${beat%4+1}/4`;
-  if(!rhythmSession||beat<0)return;
+  if(beat<0){elements.rhythmBeat.textContent=`Count-in: ${-beat}`;return;}
+  if(loopPractice){
+    const pass=loopPractice.passIndex+1;
+    const remaining=loopPractice.phase==='rest'?Math.max(0,Math.ceil(loopPractice.startBeat(loopPractice.passIndex+1)-beat)):0;
+    elements.rhythmBeat.textContent=remaining?`Rest · ${remaining} beats`:`Try ${pass}/3 · Beat ${Math.floor(beat-loopPractice.startBeat())+1}`;
+    return;
+  }
+  elements.rhythmBeat.textContent=`Beat ${beat+1} · ${beat%4+1}/4`;
+  if(!rhythmSession)return;
   const events=rhythmSession.timeline.events;
   let active=0;
   for(const event of events){if(event.startBeat<=beat)active=event.index;else break;}
   elements.scoreStrip.querySelectorAll('.score-event').forEach(n=>n.classList.toggle('beat-now',Number(n.dataset.index)===active));
 }
+function updateLoopPractice(){
+  if(!loopPractice||!rhythmSession?.anchorMs||loopPractice.finished)return;
+  const currentBeat=(performance.now()-rhythmSession.anchorMs)/rhythmSession.timeline.beatMs;
+  if(currentBeat<0)return;
+  const change=loopPractice.advance(currentBeat,engine,rhythmSession);
+  if(change.skipped){
+    elements.rhythmFeedback.textContent=`${change.skipped} note${change.skipped>1?'s':''} missed. Stay with the moving line.`;
+    render();
+  }
+  if(change.result){
+    const result=change.result;
+    elements.rhythmFeedback.textContent=`Try ${result.pass}: ${Math.round(result.accuracy)}% keys · ${result.missed} missed${result.passed?' · Passed!':' · You can try again!'}`;
+    elements.rhythmLoopStatus.textContent=`Try ${result.pass}/3 · ${Math.round(result.accuracy)}% · ${result.passed?'SUCCESS':'Try again'}`;
+  }
+  if(change.reset){
+    clearMicLatch();midiChordHolds.clear();keyboard.setDetected(null);
+    render();
+    elements.rhythmFeedback.textContent=`Try ${loopPractice.passIndex+1} of 3. Follow the gold notes!`;
+    elements.rhythmLoopStatus.textContent=`Try ${loopPractice.passIndex+1} / 3`;
+  }
+  if(change.phase==='rest'){
+    keyboard.setTarget(null);
+    const remaining=Math.max(1,Math.ceil(loopPractice.startBeat(loopPractice.passIndex+1)-currentBeat));
+    elements.rhythmBeat.textContent=`Rest · ${remaining} of 4 beats`;
+    elements.rhythmLoopStatus.textContent=`Get ready · try ${loopPractice.passIndex+2}/3`;
+  }
+  if(change.finished){
+    if(loopTimer!==null){clearInterval(loopTimer);loopTimer=null;}
+    loopPassOverride=loopPractice.passed;
+    elements.rhythmLoopStatus.textContent=loopPractice.passed?`Passed on try ${loopPractice.results.length}!`:'3 tries completed · Keep practicing';
+    if(loopPractice.passed){status('Wonderful playing! You completed the melody in time!','success');suppressUntil=Date.now()+1200;void soundCelebration().catch(console.warn);}
+    else status('Three tries completed. See your results, then try the lesson again.','try-again');
+    metronome?.stop();metronome=null;
+    elements.rhythmStart.disabled=false;elements.rhythmStop.disabled=true;
+    // The final attempt may have ended with missed notes rather than physical presses.
+    if(!engine.state().done)while(!engine.state().done)engine.skipEvent();
+    render();
+  }
+}
+
 async function startRhythm(){
   if(!engine||engine.state().done)return;
   if(voice?.isSpeaking)stopVoice();
@@ -176,12 +229,23 @@ async function startRhythm(){
   elements.rhythmBpm.value=String(bpm);
   updateTempoHUD();
   const instance=new RhythmSession(engine.lesson,bpm,speed,4);
+  loopPassOverride=null;
+  // Three complete timeline passes with a four-beat empty bar between them.
+  if(elements.rhythmLoop.checked){
+    engine.restart();render();
+    loopPractice=new LoopPractice(engine.lesson,bpm,speed,{passes:3,restBeats:4,needOnTime:elements.rhythmGrade.checked && !(selectedLayout===HAPE&&chordLesson()&&elements.chordMode.value==='build')});
+    instance.loopPractice=loopPractice;
+    elements.rhythmLoopStatus.textContent='Try 1 / 3';
+  }else loopPractice=null;
   const tick=new Metronome(onMetronomeBeat);
   try{
     await tick.start(instance,{audible:elements.metronomeAudible.checked});
     rhythmSession=instance;metronome=tick;
+    if(loopPractice){
+      loopTimer=setInterval(updateLoopPractice,30);
+    }
     elements.rhythmStart.disabled=true;elements.rhythmStop.disabled=false;
-    elements.rhythmFeedback.textContent=elements.rhythmGrade.checked?'Listen for four beats, then play in time!':'Metronome-only practice. Timing grades are off.';
+    elements.rhythmFeedback.textContent=loopPractice?'Three tries begin after the count-in. A four-beat rest separates each try.':elements.rhythmGrade.checked?'Listen for four beats, then play in time!':'Metronome-only practice. Timing grades are off.';
     status('Four-beat count-in started. Listen, then play the score from left to right.');
   }catch(error){tick.stop();stopRhythm({message:false});status(`Could not start beat: ${error.message}`,'try-again');}
 }
@@ -202,7 +266,7 @@ function syncRhythmLesson(){
 }
 function refreshScore(){
   if(!engine)return;
-  buildScoreStrip(elements.scoreStrip,engine.lesson,engine.position,rhythmSession?.report().events||[]);
+  buildScoreStrip(elements.scoreStrip,engine.lesson,engine.position,(rhythmSession?.report().events||[]).filter(g=>!loopPractice||g.pass===loopPractice.passIndex));
 }
 function recordAttempt(midi,source,index,correct,onsetMs,grade=null){
   attemptLog.push({index,midi,source,correct,timeMs:Math.round(onsetMs),beatGrade:grade?.label||null,offsetMs:grade?.deltaMs??null});
@@ -248,16 +312,20 @@ function saveCompleted(){
   if(completedSaved)return;
   completedSaved=true;
   const {summary,lesson}=engine.state();
-  const report=rhythmSession?.report()??null;
+  const best=loopPractice?.best;
+  const report=best?rhythmSession?.reportPass(best.pass-1)??null:rhythmSession?.report()??null;
   const record={id:crypto?.randomUUID?.()??`${Date.now()}-${Math.random()}`,lessonId:lesson.id,title:lesson.title,
-    finishedAt:new Date().toISOString(),keyAccuracy:summary.accuracy,correct:summary.correctPresses,attempts:summary.attempts,
-    expected:summary.expectedPresses,wrong:summary.wrongPresses,
-    rhythm:elements.rhythmGrade.checked?report:null,tempo:rhythmSession?.timeline.effectiveBpm??null,attemptLog};
+    finishedAt:new Date().toISOString(),keyAccuracy:best?.accuracy??summary.accuracy,correct:best?.correct??summary.correctPresses,attempts:best?.attempts??summary.attempts,
+    expected:summary.expectedPresses,wrong:best?.wrong??summary.wrongPresses,
+    rhythm:elements.rhythmGrade.checked?report:null,tempo:rhythmSession?.timeline.effectiveBpm??null,attemptLog,
+    loopChallenge:loopPractice?.report()??null,loopPassed:loopPassOverride,
+    // Progress is gated by loopPassed; the actual best score remains truthful.
+    loopBestScore:best?.accuracy??null};
   currentSessionId=record.id;
   saveSession(record);buildHistoryUI();
 }
 function resetPerformance(){
-  stopRhythm({message:false});midiChordHolds.clear();completedSaved=false;attemptLog=[];lastOnsetResult=null;currentSessionId='';
+  stopRhythm({message:false});loopPassOverride=null;midiChordHolds.clear();completedSaved=false;attemptLog=[];lastOnsetResult=null;currentSessionId='';
   elements.rhythmFeedback.textContent='Timing not started.';
 }
 function exportPracticeHistory(){
@@ -387,22 +455,37 @@ function resetReferenceCorrection(){
 function hideResults(){elements.results.hidden=true;}
 function showResults(){
   const {summary,nextLessonId}=engine.state();
-  const accuracy=Math.round(summary.accuracy*10)/10;
+  const best=loopPractice?.best;
+  const display=best?{...summary,accuracy:best.accuracy,attempts:best.attempts,correctPresses:best.correct,wrongPresses:best.wrong}:summary;
+  const accuracy=Math.round(display.accuracy*10)/10;
   elements.resultAccuracy.textContent=`${accuracy}%`;
-  elements.resultAttempts.textContent=String(summary.attempts);
+  elements.resultAttempts.textContent=String(display.attempts);
   elements.resultIdeal.textContent=String(summary.expectedPresses);
-  elements.resultWrong.textContent=String(summary.wrongPresses);
-  elements.resultScoreCaption.textContent=summary.perfect?'Perfect playing! Every key press was right.':'Correct detected keys ÷ all key attempts (not rhythm accuracy)';
-  const report=rhythmSession?.report();
+  elements.resultWrong.textContent=String(display.wrongPresses);
+  elements.resultScoreCaption.textContent=loopPractice?'Best of your three tries · missed notes count':summary.perfect?'Perfect playing! Every key press was right.':'Correct detected keys ÷ all key attempts (not rhythm accuracy)';
+  const report=loopPractice?.best?rhythmSession?.reportPass(loopPractice.best.pass-1):rhythmSession?.report();
   elements.resultTiming.textContent=elements.rhythmGrade.checked&&report?.assessed?`${report.onTime} / ${report.assessed}`:'Not graded';
   elements.resultHolds.textContent=elements.rhythmGrade.checked&&report?.holdsMeasured?`${report.holdsGood} / ${report.holdsMeasured}`:'Not measured';
+  const loopResults=$('loop-results');
+  if(loopPractice?.results?.length){
+    const report=loopPractice.report();
+    loopResults.hidden=false;
+    loopResults.replaceChildren();
+    const title=document.createElement('h3');title.textContent=`Rhythm Highway · ${loopPractice.results.length} of 3 tries`;
+    loopResults.append(title);
+    for(const pass of loopPractice.results){
+      const item=document.createElement('div');item.className=`loop-result-row ${pass.passed?'passed':''}`;
+      item.textContent=`Try ${pass.pass} · ${Math.round(pass.accuracy)}% key accuracy · ${pass.missed} missed · ${pass.onTime}/${pass.assessed} on beat${pass.passed?' · PASSED ✓':''}`;
+      loopResults.append(item);
+    }
+  }else loopResults.hidden=true;
   elements.resultNext.disabled=!nextLessonId;
   elements.resultNext.textContent=nextLessonId?'Next lesson →':'No more lessons yet';
   saveCompleted();
   metronome?.stop();metronome=null;
   elements.rhythmStart.disabled=false;elements.rhythmStop.disabled=true;
   elements.results.hidden=false;
-  if(gameUI)gameUI.onComplete();
+  if(gameUI)gameUI.onComplete(loopPassOverride);
   else elements.results.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function render(){
@@ -440,7 +523,9 @@ function render(){
   }
   refreshScore();
   elements.demo.disabled=done;
-  if(done){
+  if(done&&loopPractice&&!loopPractice.finished){
+    elements.hint.textContent='Great! Stay ready for the next beat or try.';
+  }else if(done){
     status('You did it! 🌟 Review your score below, restart this lesson, or move to the next one.','success');
     showResults();
   }else{
@@ -460,6 +545,10 @@ async function submitNote(midi,source,press={}){
   if((source==='mic'||source==='midi')&&(previewActive||voice?.isSpeaking||Date.now()<suppressUntil||pendingCalibration))return;
   if(source==='mic'&&Date.now()-lastMidiAt<1300)return;
   if(engine.state().done)return;
+  if(loopPractice&&rhythmSession?.anchorMs){
+    const beat=(performance.now()-rhythmSession.anchorMs)/rhythmSession.timeline.beatMs;
+    if(!loopPractice.isAllowed(engine.position,beat)){if(loopPractice.phase==='rest')status('Enjoy the four-beat break. Your next try is coming!');return;}
+  }
   if(elements.rhythmGrade.checked&&rhythmSession?.isCountingIn(performance.now())){status('Wait for the four-beat count-in to finish.');return;}
   keyboard.pulse(midi);keyboard.setDetected(midi);
   if(source==='screen'||source==='midi'){
@@ -476,7 +565,7 @@ async function submitNote(midi,source,press={}){
   if(result.correct&&result.eventComplete&&Number.isFinite(press.holdMs))recordHoldForStep(before.position,press.holdMs,source);
   if(result.correct){
     if(result.eventComplete){
-      await handleCorrectFeedback(result.done);
+      await handleCorrectFeedback(result.done&&!loopPractice);
       render();
       if(!result.done){
         status(`Great! ${noteList(before.target)} complete. Next: ${noteList(result.target)}.`,'success');
@@ -494,12 +583,13 @@ async function submitNote(midi,source,press={}){
 async function submitMidiChord(notes,onsetMs=performance.now()){
  if(selectedLayout!==MAUDIO||!engine||!scoringAllowed()||previewActive||voice?.isSpeaking||Date.now()<suppressUntil||pendingCalibration)return;
  if(rhythmSession?.isCountingIn(performance.now()))return;
+ if(loopPractice&&rhythmSession?.anchorMs&&!loopPractice.isAllowed(engine.position,(performance.now()-rhythmSession.anchorMs)/rhythmSession.timeline.beatMs))return;
  const before=engine.state();
  const result=engine.acceptChord(notes);
  const grade=result?.eventComplete?timingForStep(before.position,onsetMs,'midi'):null;
  for(const n of notes)recordAttempt(n,'midi',before.position,true,onsetMs,grade);
  keyboard.setDetected(notes);notes.forEach(n=>keyboard.pulse(n));
- if(result?.eventComplete){await handleCorrectFeedback(result.done);render();if(!result.done)status(`Excellent chord! Next: ${noteList(result.target)}.`,'success');}
+ if(result?.eventComplete){await handleCorrectFeedback(result.done&&!loopPractice);render();if(!result.done)status(`Excellent chord! Next: ${noteList(result.target)}.`,'success');}
 }
 async function submitMicChord(notes){
   if(selectedLayout===MAUDIO||!engine||!scoringAllowed()||!chordLesson()||elements.chordMode.value!=='together')return;
@@ -512,13 +602,14 @@ async function submitMicChord(notes){
   }
   keyboard.setDetected(distinct);
   if(rhythmSession?.isCountingIn(performance.now()))return;
+  if(loopPractice&&rhythmSession?.anchorMs&&!loopPractice.isAllowed(engine.position,(performance.now()-rhythmSession.anchorMs)/rhythmSession.timeline.beatMs))return;
   const before=engine.state();
   const onset=performance.now();
   const result=engine.acceptChord(expected);
   const compensated=onset-Math.min(450,Math.max(0,Number(elements.micTimingOffset.value)||0));
   const grade=result.eventComplete?timingForStep(before.position,compensated,'mic-together'):null;
   expected.forEach(n=>{recordAttempt(n,'mic-together',before.position,true,onset,grade);keyboard.pulse(n);});
-  if(result?.eventComplete){await handleCorrectFeedback(result.done);render();if(!result.done)status(`Great chord! Next: ${noteList(result.target)}.`,'success');}
+  if(result?.eventComplete){await handleCorrectFeedback(result.done&&!loopPractice);render();if(!result.done)status(`Great chord! Next: ${noteList(result.target)}.`,'success');}
 }
 async function playOnScreen(midi,press={}){
   stopMelodyPreview();
@@ -956,7 +1047,7 @@ async function boot(){
       elements.lesson.append(option);
     });
     elements.lesson.value=engine.lesson.id;
-    elements.releaseStatus.textContent=`v2.4 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord lessons`;
+    elements.releaseStatus.textContent=`v2.5 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord lessons`;
     syncRhythmLesson();
     buildHistoryUI();
     render();
@@ -973,6 +1064,7 @@ async function boot(){
   // Best effort: listing device labels can be slow or fail on Android.
   void refreshMicrophones();
   elements.rhythmStart.addEventListener('click',startRhythm);
+  elements.rhythmLoop.addEventListener('change',()=>{if(rhythmSession)stopRhythm();elements.rhythmLoopStatus.textContent=elements.rhythmLoop.checked?'3 tries · 1 bar between':'Repeat challenge off';});
   elements.rhythmStop.addEventListener('click',()=>stopRhythm());
   elements.rhythmBpm.addEventListener('change',changeRhythmSettings);
   elements.rhythmSpeed.addEventListener('change',changeRhythmSettings);

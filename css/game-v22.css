@@ -174,3 +174,12 @@ html{scroll-behavior:smooth}body{background:#f4f7fa;color:var(--game-ink)}
 @media(max-width:550px){.game-player .controls-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.game-player .controls-row .btn{width:100%}}
 
 .input-status-message{font-size:11px;font-weight:700;color:#9b4d21;margin:4px 2px 1px}.piano-panel[data-layout="maudio"] .input-status-message{color:#245f8f}
+
+/* v2.5: three-try rhythm repeat challenge */
+.rhythm-loop-status{display:inline-flex;padding:6px 12px;border-radius:18px;background:#d6f1ed;color:#165e5d;font-weight:750;font-size:12px}
+.loop-toggle{background:#fff3d4!important;border-radius:12px;padding:10px 14px!important}
+.loop-results{margin:15px 0;padding:16px;border:1px solid #d7e8e3;background:#f7fbf9;border-radius:15px}
+.loop-results h3{margin:0 0 9px;font-size:17px}
+.loop-result-row{padding:9px 8px;border-bottom:1px solid #d7e8e3;font-weight:650;font-size:13px}
+.loop-result-row:last-child{border:0}.loop-result-row.passed{color:#167a63;background:#e5f9ef;border-radius:8px}
+@media(max-width:700px){.rhythm-loop-status{width:100%;justify-content:center}}

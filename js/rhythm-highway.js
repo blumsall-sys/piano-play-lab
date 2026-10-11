@@ -43,12 +43,27 @@ export class RhythmHighway {
       ctx.beginPath();ctx.moveTo(x,23);ctx.lineTo(x,height-12);ctx.stroke();
       ctx.fillStyle=beat%4===0?'#adc7e0':'#587392';ctx.font='11px system-ui';ctx.fillText(`BEAT ${beat+1}`,x+5,20);
     }
+    const loop=session?.loopPractice;
+    // Render successive complete copies of the score on one continuous clock.
+    // The four-beat empty measures are visible between runs.
+    const passes=loop?.passes??1;
+    for(let pass=0;pass<passes;pass++){
+      const base=loop?loop.startBeat(pass):0;
+      if(loop&&pass>0){
+        const restX=hitX+(loop.endBeat(pass-1)-currentBeat)*pixelsPerBeat;
+        const restW=loop.restBeats*pixelsPerBeat;
+        if(restX+restW>0&&restX<width){
+          ctx.fillStyle='rgba(93,125,167,.14)';ctx.fillRect(restX,blockY,restW,blockH);
+          ctx.fillStyle='#b5c8de';ctx.font='700 14px system-ui';ctx.textAlign='center';
+          ctx.fillText('REST · 4 BEATS',restX+restW/2,blockY+blockH/2,restW-10);
+        }
+      }
     timeline.events.forEach(event=>{
-      const x=hitX+(event.startBeat-currentBeat)*pixelsPerBeat;
+      const x=hitX+(base+event.startBeat-currentBeat)*pixelsPerBeat;
       const w=Math.max(42,event.durationBeats*pixelsPerBeat-7);
       if(x+w<0||x>width)return;
-      const passed=event.index<state.position;
-      const current=event.index===state.position;
+      const passed=loop?(pass<loop.passIndex || (pass===loop.passIndex&&event.index<state.position)):event.index<state.position;
+      const current=loop?(pass===loop.passIndex&&loop.phase==='playing'&&event.index===state.position):event.index===state.position;
       let color=passed?'#2c9d88':current?'#ffce6c':'#c9e0f1';
       ctx.globalAlpha=passed?.62:1;
       ctx.fillStyle=color;
@@ -68,6 +83,11 @@ export class RhythmHighway {
       ctx.globalAlpha=1;
       if(current){ctx.strokeStyle='#fff6d4';ctx.lineWidth=2;ctx.stroke();}
     });
+    }
+    if(loop){
+      ctx.fillStyle='#dceefd';ctx.font='800 12px system-ui';ctx.textAlign='right';
+      ctx.fillText(`TRY ${loop.passIndex+1} / ${loop.passes}`,width-14,19);
+    }
     const nowX=hitX;
     ctx.shadowColor='#5ce6ed';ctx.shadowBlur=12;ctx.strokeStyle='#65f0ee';ctx.lineWidth=3;
     ctx.beginPath();ctx.moveTo(nowX,25);ctx.lineTo(nowX,height-10);ctx.stroke();ctx.shadowBlur=0;

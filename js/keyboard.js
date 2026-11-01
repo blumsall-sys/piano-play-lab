@@ -93,7 +93,7 @@ export class Keyboard {
     if(changed&&notes.length)requestAnimationFrame(()=>this.revealTarget(notes[0]));
   }
   revealTarget(midi){
-    const area=this.svg.parentElement;
+    const area=this.svg.closest('.keyboard-scroll')||this.svg.parentElement;
     const key=this.nodes.get(midi)?.rect;
     if(!key||area.scrollWidth<=area.clientWidth+1)return;
     const factor=this.svg.getBoundingClientRect().width/this.svg.viewBox.baseVal.width;

@@ -50,9 +50,9 @@ test('control row and highway precede keyboard while redundant music-room title 
   const ui=source('js/game-ui.js');
   const main=source('js/main.js');
   const css=source('css/game-v22.css');
-  assert.match(ui,/play\.append\(lesson,rhythm,handCoach,highwayBox,piano\)/);
+  assert.match(ui,/play\.append\(lesson,rhythm,handCoach,piano\)/);
   assert.match(ui,/redundantHeading\?\.remove\(\)/);
-  assert.match(ui,/highwayBox\.querySelector\('\.highway-key'\)\.append\(keyLegend\)/);
+  assert.match(ui,/keyInfo\.append\(keyLegend\)/);
   assert.match(ui,/settings-mix-sliders/);
   assert.match(ui,/quick-mix-sliders/);
   assert.match(main,/setupAudioMixUI\(\)/);

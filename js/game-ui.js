@@ -1,7 +1,7 @@
 // Application navigation, kid-friendly lesson map and three-checkpoint learning flow.
 // Audio, keyboard, score grading and MIDI remain in the v2.1 modules.
 import {loadHistory} from './progress-store.js';
-import {RhythmHighway} from './rhythm-highway.js?v=2.9';
+import {RhythmHighway} from './falling-highway-v3.js';
 const KEY='cleos-piano-play-v2.2-settings';
 const ACTIVE_KEY='cleos-piano-play-v2.2-active';
 const PASS=70;
@@ -53,14 +53,15 @@ export function saveActive(state){
   }catch{}
 }
 export class GameUI{
-  constructor({engine,chooseLesson,onModeChange,onNavigate,onPageChange,getSession,getTempo,onNarrate}){
+  constructor({engine,chooseLesson,onModeChange,onNavigate,onPageChange,getSession,getTempo,onNarrate,onHandGuide}){
     this.engine=engine;this.chooseLesson=chooseLesson;this.onModeChange=onModeChange;
-    this.onNavigate=onNavigate;this.onPageChange=onPageChange;this.getSession=getSession;this.getTempo=getTempo;this.onNarrate=onNarrate;
+    this.onNavigate=onNavigate;this.onPageChange=onPageChange;this.getSession=getSession;this.getTempo=getTempo;this.onNarrate=onNarrate;this.onHandGuide=onHandGuide||(()=>{});
+    this.handGuidesEnabled=false;try{this.handGuidesEnabled=localStorage.getItem('cleos-piano-hand-guides-v3')==='yes';}catch{}
     this.settings={unlockAll:false};
     try{Object.assign(this.settings,JSON.parse(localStorage.getItem(KEY)||'{}'));}catch{}
     this.view='home';this.makeLayout();this.wire();
     this.highway=new RhythmHighway($('highway-canvas'),{
-      getState:()=>this.engine?.state(),getSession, getTempo,isVisible:()=>this.view==='play'
+      getState:()=>this.engine?.state(),getSession, getTempo,isVisible:()=>this.view==='play',getKeyboard:()=>document.querySelector('#keyboard')
     });
     this.sync(this.engine.state());this.show('home');
   }
@@ -86,16 +87,27 @@ export class GameUI{
     home.id='screen-home';
     const map=create('section','game-page map-page',`<div class="page-title"><span class="overline">YOUR MUSICAL JOURNEY</span><h1>Choose your adventure</h1><p>Finish each lesson with at least ${PASS}% note accuracy to unlock the next one. You can always try again.</p></div><div id="lesson-map" class="lesson-map"></div>`);
     map.id='screen-map';map.append(history);
-    const play=create('section','game-page game-player',`<div class="player-topbar"><div><span class="overline">NOW PLAYING · <span id="player-lesson-number">LESSON 1</span></span><h2 id="player-lesson-title">Find the First F</h2></div><div class="player-actions"><span id="player-stars">☆ ☆ ☆</span><button class="btn btn-secondary" id="game-narrate">🔊 Hear Cleo's instructions</button><button class="btn btn-secondary" data-page="map">✕ Exit</button></div></div><div id="lesson-checkpoints" class="checkpoint-track" aria-label="Lesson checkpoints"></div><div class="highway-title"><div><span class="overline">RHYTHM HIGHWAY</span><p>Read ahead: notes travel toward the <b>PLAY</b> line.</p></div><div id="mode-switch" class="mode-switch" role="group" aria-label="Practice mode"><button type="button" data-mode="learn" aria-pressed="true">Learn · no timer</button><button type="button" data-mode="perform" aria-pressed="false">Perform · on beat</button></div></div>`);
+    const play=create('section','game-page game-player',`<div class="player-topbar"><div><span class="overline">NOW PLAYING · <span id="player-lesson-number">LESSON 1</span></span><h2 id="player-lesson-title">Find the First F</h2></div><div class="player-actions"><span id="player-stars">☆ ☆ ☆</span><button class="btn btn-secondary" id="game-narrate">🔊 Hear Cleo's instructions</button><button class="btn btn-secondary" data-page="map">✕ Exit</button></div></div><div id="lesson-checkpoints" class="checkpoint-track" aria-label="Lesson checkpoints"></div><div class="highway-title"><div><span class="overline">RHYTHM HIGHWAY</span><p>Read ahead: colour-coded notes fall directly toward their piano keys.</p></div><div id="mode-switch" class="mode-switch" role="group" aria-label="Practice mode"><button type="button" data-mode="learn" aria-pressed="true">Learn · no timer</button><button type="button" data-mode="perform" aria-pressed="false">Perform · on beat</button></div></div>`);
     play.id='screen-play';
     const handCoach=create('div','hand-coach',`<span class="hand-coach-icon">✋</span><span id="hand-coach-text">Follow the gold notes. Hand and finger hints appear here when a lesson teaches them.</span>`);
     const highwayBox=create('div','highway-box',`<canvas id="highway-canvas" height="180" aria-label="Scrolling rhythm highway displaying note names, chords, and durations"></canvas><div class="highway-key"><span class="dot gold"></span> Current <span class="dot blue"></span> Upcoming <span class="dot green"></span> Completed</div>`);
-    // Rhythm controls ABOVE the notes; notes sit immediately above the piano.
-    play.append(lesson,rhythm,handCoach,highwayBox,piano);
+    // Shared horizontal scroll keeps falling-note columns exactly aligned with piano keys.
+    play.append(lesson,rhythm,handCoach,piano);
+    const scroll=piano.querySelector('.keyboard-scroll');
+    const stage=create('div','falling-stage');
+    const highwayCanvas=highwayBox.querySelector('#highway-canvas');
+    const keys=piano.querySelector('#keyboard');
+    stage.append(highwayCanvas,keys);
+    scroll.replaceChildren(stage);
+    const keyInfo=highwayBox.querySelector('.highway-key');
+    scroll.after(keyInfo);
+    highwayBox.remove();
+    const fingerToggle=create('label','finger-toggle',`<input type="checkbox" id="hand-guide-toggle"> 👋 Show finger guides`);
+    play.querySelector('.highway-title').insertBefore(fingerToggle,play.querySelector('.mode-switch'));
     // Keep the key colour guide next to the highway's beat legend, not above the piano.
     const redundantHeading=piano.querySelector('.section-heading');
     const keyLegend=redundantHeading?.querySelector('.legend');
-    if(keyLegend){keyLegend.classList.add('piano-mini-legend');highwayBox.querySelector('.highway-key').append(keyLegend);}
+    if(keyLegend){keyLegend.classList.add('piano-mini-legend');keyInfo.append(keyLegend);}
     redundantHeading?.remove();
     const accessibleTitle=create('span','sr-only','Interactive piano keys');
     accessibleTitle.id='piano-title';piano.prepend(accessibleTitle);
@@ -156,6 +168,12 @@ export class GameUI{
     $('home-continue').addEventListener('click',()=>this.continueLesson());
     $('home-start').addEventListener('click',()=>this.continueLesson());
     $('game-narrate').addEventListener('click',()=>this.onNarrate());
+    const toggle=$('hand-guide-toggle');toggle.checked=this.handGuidesEnabled;
+    toggle.addEventListener('change',()=>{
+      this.handGuidesEnabled=toggle.checked;
+      try{localStorage.setItem('cleos-piano-hand-guides-v3',toggle.checked?'yes':'no');}catch{}
+      this.sync(this.engine.state());
+    });
     document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>this.setMode(b.dataset.mode)));
     $('unlock-all-lessons').checked=this.settings.unlockAll;
     $('unlock-all-lessons').addEventListener('change',event=>{
@@ -222,6 +240,8 @@ export class GameUI{
       handCoach.textContent=state.lesson.handGuide?(code?`${code} · ${state.lesson.handGuide}`:state.lesson.handGuide):'Follow the gold notes as they reach the play line.';
       handCoach.closest('.hand-coach').hidden=!state.lesson.handGuide;
     }
+    const notes=state.done?[]:(Array.isArray(state.target)?state.target:[state.target]);
+    this.onHandGuide(notes,state.done?null:state.lesson.handAssignments?.[state.position],this.handGuidesEnabled);
     const done=state.position,steps=checkpoints(state);
     $('lesson-checkpoints').innerHTML=steps.map((s,i)=>`<div class="checkpoint ${s.done?'complete':(done>=s.start?'active':'')}"><span class="checkpoint-icon">${s.done?'✓':i+1}</span><span>Step ${i+1}<b>${s.label}</b></span></div>`).join('');
     const loop=this.getSession()?.loopPractice;

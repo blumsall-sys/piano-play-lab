@@ -1,4 +1,5 @@
-import {GameUI,restoreActive} from './game-ui.js?v=2.9';
+import {GameUI,restoreActive} from './game-ui.js?v=3.0';
+import {updateFingerGuides} from './finger-guides-v3.js';
 import {Keyboard} from './keyboard.js?v=2.9';
 import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.9';
 import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.9';
@@ -132,7 +133,7 @@ function setInstrumentLayout(layout,{save=true}={}){
   midiHeld.clear();midiOnsets.clear();midiChordHolds.clear();midiSoundAllOff();
   const profile=displayProfile();
   keyboard?.setProfile(profile);
-  if(engine){keyboard.setTarget(engine.state().done?null:engine.target);keyboard.setCollected(engine.state().collected);}
+  if(engine){keyboard.setTarget(engine.state().done?null:engine.target);keyboard.setCollected(engine.state().collected);gameUI?.sync(engine.state());}
   $('piano-title').textContent=selectedLayout===MAUDIO?'Your M-Audio MIDI keyboard':'Your interactive Hape toy piano';
   const footer=document.querySelector('.keyboard-footer');
   if(footer){footer.children[0].textContent=`← ${midiToName(profile.first)}`;footer.children[1].textContent=`${profile.count} keys · ${selectedLayout===MAUDIO?'USB MIDI controller':'Hape toy piano'}`;footer.children[2].textContent=`${midiToName(profile.last)} →`;}
@@ -1243,7 +1244,8 @@ async function boot(){
       },
       getSession:()=>rhythmSession||(loopPractice?.guided?{timeline:loopPractice.timeline,loopPractice,anchorMs:null}:null),
       getTempo:()=>({bpm:selectedBpm(),speed:selectedMultiplier()}),
-      onNarrate:()=>elements.voiceRead.click()
+      onNarrate:()=>elements.voiceRead.click(),
+      onHandGuide:(notes,assignments,enabled)=>updateFingerGuides(keyboard.svg,notes,assignments,enabled)
     });
     setupInstrumentUI();
     setupAudioMixUI();
@@ -1258,7 +1260,7 @@ async function boot(){
       elements.lesson.append(option);
     });
     elements.lesson.value=engine.lesson.id;
-    elements.releaseStatus.textContent=`v2.9 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord/two-hand lessons · ${loaded.source}`;
+    elements.releaseStatus.textContent=`v3.0 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord/two-hand lessons · ${loaded.source}`;
     elements.releaseStatus.classList.toggle('catalog-warning',!!loaded.warning);
     if(loaded.warning){elements.releaseStatus.textContent+=' · WARNING: '+loaded.warning;console.warn(loaded.warning);}
     syncRhythmLesson();

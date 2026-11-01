@@ -13,7 +13,7 @@ test('rhythm UI controls are present and wired to code',()=>{
  }
 });
 test('document and source version are consistent',()=>{
- assert.match(page,/v2\.9 READY|v2\.9 · 50 lessons/);
- assert.match(page,/main\.js\?v=2\.9/);
- assert.match(page,/styles\.css\?v=2\.9/);
+ assert.match(page,/v3\.0 READY|v3\.0 · 50 lessons/);
+ assert.match(page,/main\.js\?v=3\.0/);
+ assert.match(page,/styles\.css\?v=3\.0/);
 });

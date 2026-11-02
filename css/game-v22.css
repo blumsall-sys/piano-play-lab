@@ -260,3 +260,48 @@ html{scroll-behavior:smooth}body{background:#f4f7fa;color:var(--game-ink)}
 /* A capped keyboard width avoids oversized keys being cropped below laptop screens. */
 .game-player .piano-panel .falling-stage{max-width:900px;margin:0 auto}
 @media(max-width:830px){.game-player .piano-panel .falling-stage{max-width:none;margin:0}}
+
+
+/* v3.1 adjustable falling highway, illustrated finger opacity, fullscreen focus */
+.game-player .piano-panel .falling-stage #highway-canvas{height:var(--lane-height,390px)!important;min-height:160px;max-height:none!important;touch-action:pan-x}
+.practice-view-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:3px 5px}
+.practice-view-controls label{display:flex;align-items:center;gap:6px;color:#4b6176;font-size:11px;font-weight:750;white-space:nowrap}
+.practice-view-controls select{background:#fff;border:1px solid #d1dbe3;border-radius:9px;padding:7px;color:#19304a;font-weight:700}
+.practice-view-controls input[type=range]{width:90px;accent-color:#db7d49}
+.practice-view-controls output{min-width:33px}
+.practice-view-controls .focus-enter{min-height:34px;padding:6px 11px;font-size:12px;background:#162f50;color:#fff;border-color:#162f50}
+.highway-resize-grip{background:#1c3651;color:#9ad8e7;height:20px;display:flex;align-items:center;justify-content:center;cursor:ns-resize;touch-action:none;font-size:10px;letter-spacing:.1em;user-select:none}
+.highway-resize-grip:focus-visible{outline:2px solid #47c5e5;outline-offset:-2px}
+.game-player .piano-panel .falling-stage{overflow:visible}
+.focus-hud,.focus-results{display:none}
+.game-in-focus{position:fixed!important;inset:0;width:100vw;height:100dvh;overflow:hidden;z-index:9999;background:#0b1527;padding:8px!important;display:flex!important;flex-direction:column;gap:4px;margin:0!important;color:#f1f6fb}
+.game-in-focus .lesson-top,.game-in-focus .rhythm-panel,.game-in-focus .highway-title,.game-in-focus .hand-coach,
+.game-in-focus .piano-panel .controls-row,.game-in-focus .quick-sound-mix,.game-in-focus .keyboard-footer,
+.game-in-focus .highway-key,.game-in-focus .melody-message,.game-in-focus .mic-tools,.game-in-focus .calibration-panel,
+.game-in-focus .chord-guide{display:none!important}
+.game-in-focus .focus-hud{display:flex!important;align-items:center;justify-content:space-between;gap:8px;padding:4px 6px;color:#fff;min-height:45px}
+.game-in-focus .focus-lesson-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.game-in-focus .focus-lesson-info span{font-weight:850;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:min(45vw,450px)}
+.game-in-focus .focus-lesson-info small{font-size:10px;color:#a7c6de}
+.game-in-focus .focus-actions{display:flex;align-items:center;gap:5px}
+.game-in-focus .focus-actions button,.game-in-focus .focus-result-actions button{border-radius:9px;padding:9px 12px;border:1px solid #537695;background:#173455;color:#e5f9ff;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap}
+.game-in-focus .focus-actions #focus-start{background:#13a58e;border-color:#13a58e;color:#fff}
+.game-in-focus .focus-actions #focus-exit{background:#385065}
+.game-in-focus .piano-panel{display:flex;flex:1;min-height:0;flex-direction:column;padding:0!important;border:0!important;background:transparent!important;margin:0!important;box-shadow:none!important}
+.game-in-focus .keyboard-scroll{display:block;flex:1;min-height:0;overflow-x:auto!important;overflow-y:hidden!important;margin:0!important}
+.game-in-focus .falling-stage{width:100%}
+.game-in-focus .falling-stage #keyboard{background:#0b1527}
+.game-in-focus .falling-stage #highway-canvas{height:var(--lane-height,390px)!important}
+.game-in-focus .focus-results:not([hidden]){display:flex!important;position:absolute;inset:0;z-index:100;align-items:center;justify-content:center;background:#050e1bdc;padding:20px;overflow:auto}
+.focus-results[hidden]{display:none!important}
+.focus-results-card{background:#fff7e9;color:#243449;border-radius:22px;max-width:610px;width:100%;padding:clamp(18px,3vw,32px);box-shadow:0 20px 80px #0008}
+.focus-results-card h2{font-size:clamp(24px,3.3vw,36px);margin:6px 0 9px}
+.focus-results-card p{font-size:14px;line-height:1.5}
+.focus-score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:16px 0}
+.focus-score-grid div{padding:9px;background:#fff;border-radius:10px;font-size:11px;color:#577087}
+.focus-score-grid strong{display:block;font-size:20px;margin-top:6px;color:#122b47}
+.focus-result-actions{display:flex;flex-wrap:wrap;gap:8px}
+.focus-result-actions button{background:#1a9e8e!important;border:0!important;color:#fff!important}
+.focus-result-actions button:disabled{opacity:.45;cursor:not-allowed}
+body.focus-fallback{overflow:hidden!important}
+@media(max-width:620px){.practice-view-controls{width:100%;justify-content:flex-end}.practice-view-controls .focus-enter{flex:1}.game-in-focus{padding:3px!important}.game-in-focus .focus-hud{min-height:39px;gap:4px}.game-in-focus .focus-actions button{font-size:10px;padding:7px 5px}.game-in-focus .focus-lesson-info span{font-size:12px;max-width:29vw}.game-in-focus .focus-lesson-info small{font-size:9px}.focus-score-grid{grid-template-columns:repeat(2,1fr)}}

@@ -1,7 +1,8 @@
 // Application navigation, kid-friendly lesson map and three-checkpoint learning flow.
 // Audio, keyboard, score grading and MIDI remain in the v2.1 modules.
 import {loadHistory} from './progress-store.js';
-import {RhythmHighway} from './falling-highway-v3.js';
+import {RhythmHighway} from './falling-highway-v3.js?v=3.1';
+import {installFocusMode} from './focus-mode-v31.js';
 const KEY='cleos-piano-play-v2.2-settings';
 const ACTIVE_KEY='cleos-piano-play-v2.2-active';
 const PASS=70;
@@ -64,6 +65,7 @@ export class GameUI{
       getState:()=>this.engine?.state(),getSession, getTempo,isVisible:()=>this.view==='play',getKeyboard:()=>document.querySelector('#keyboard')
     });
     this.sync(this.engine.state());this.show('home');
+    this.focus=installFocusMode(this);this.sync(this.engine.state());
   }
   makeLayout(){
     const main=document.querySelector('.app-shell main');
@@ -241,7 +243,7 @@ export class GameUI{
       handCoach.closest('.hand-coach').hidden=!state.lesson.handGuide;
     }
     const notes=state.done?[]:(Array.isArray(state.target)?state.target:[state.target]);
-    this.onHandGuide(notes,state.done?null:state.lesson.handAssignments?.[state.position],this.handGuidesEnabled);
+    this.onHandGuide(notes,state.done?null:state.lesson.handAssignments?.[state.position],this.handGuidesEnabled,this.handGuideOpacity??.38);
     const done=state.position,steps=checkpoints(state);
     $('lesson-checkpoints').innerHTML=steps.map((s,i)=>`<div class="checkpoint ${s.done?'complete':(done>=s.start?'active':'')}"><span class="checkpoint-icon">${s.done?'✓':i+1}</span><span>Step ${i+1}<b>${s.label}</b></span></div>`).join('');
     const loop=this.getSession()?.loopPractice;

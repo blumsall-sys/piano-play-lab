@@ -43,8 +43,8 @@ export class RhythmHighway{
     const guided=loop?.guided?(loop.phase==='rest'?timeline.totalBeats:(timeline.events[Math.min(state.position,timeline.events.length-1)]?.startBeat??timeline.totalBeats)):null;
     const now=performance.now();
     const currentBeat=loop?.guided?loop.startBeat()+guided:highwayPosition({timeline,position:state.position,anchorMs:session?.anchorMs??null,nowMs:now});
-    const hitY=height-17,px=height/4.25;
-    for(let beat=Math.max(-4,Math.floor(currentBeat)-1);beat<currentBeat+6;beat++){
+    const visibleBeats=Math.max(6,Math.min(12,Number(this.getBeats?.()||8))),hitY=height-17,px=(height-34)/visibleBeats;
+    for(let beat=Math.max(-4,Math.floor(currentBeat)-1);beat<currentBeat+visibleBeats+2;beat++){
       const y=hitY-(beat-currentBeat)*px;if(y<-3||y>height+3)continue;
       ctx.strokeStyle=beat%4===0?'#406080':'#213952';ctx.lineWidth=beat%4===0?1.5:1;
       ctx.beginPath();ctx.moveTo(12,y);ctx.lineTo(width-10,y);ctx.stroke();

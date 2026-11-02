@@ -1,5 +1,5 @@
-import {GameUI,restoreActive} from './game-ui.js?v=3.0';
-import {updateFingerGuides} from './finger-guides-v3.js';
+import {GameUI,restoreActive} from './game-ui.js?v=3.1';
+import {updateFingerGuides} from './finger-guides-v3.js?v=3.1';
 import {Keyboard} from './keyboard.js?v=2.9';
 import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.9';
 import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.9';
@@ -1245,7 +1245,7 @@ async function boot(){
       getSession:()=>rhythmSession||(loopPractice?.guided?{timeline:loopPractice.timeline,loopPractice,anchorMs:null}:null),
       getTempo:()=>({bpm:selectedBpm(),speed:selectedMultiplier()}),
       onNarrate:()=>elements.voiceRead.click(),
-      onHandGuide:(notes,assignments,enabled)=>updateFingerGuides(keyboard.svg,notes,assignments,enabled)
+      onHandGuide:(notes,assignments,enabled,opacity)=>updateFingerGuides(keyboard.svg,notes,assignments,enabled,opacity)
     });
     setupInstrumentUI();
     setupAudioMixUI();
@@ -1260,7 +1260,7 @@ async function boot(){
       elements.lesson.append(option);
     });
     elements.lesson.value=engine.lesson.id;
-    elements.releaseStatus.textContent=`v3.0 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord/two-hand lessons · ${loaded.source}`;
+    elements.releaseStatus.textContent=`v3.1 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord/two-hand lessons · ${loaded.source}`;
     elements.releaseStatus.classList.toggle('catalog-warning',!!loaded.warning);
     if(loaded.warning){elements.releaseStatus.textContent+=' · WARNING: '+loaded.warning;console.warn(loaded.warning);}
     syncRhythmLesson();

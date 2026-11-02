@@ -1245,7 +1245,7 @@ async function boot(){
       getSession:()=>rhythmSession||(loopPractice?.guided?{timeline:loopPractice.timeline,loopPractice,anchorMs:null}:null),
       getTempo:()=>({bpm:selectedBpm(),speed:selectedMultiplier()}),
       onNarrate:()=>elements.voiceRead.click(),
-      onHandGuide:(notes,assignments,enabled)=>updateFingerGuides(keyboard.svg,notes,assignments,enabled)
+      onHandGuide:(notes,assignments,enabled,opacity)=>updateFingerGuides(keyboard.svg,notes,assignments,enabled,opacity)
     });
     setupInstrumentUI();
     setupAudioMixUI();
@@ -1260,7 +1260,7 @@ async function boot(){
       elements.lesson.append(option);
     });
     elements.lesson.value=engine.lesson.id;
-    elements.releaseStatus.textContent=`v3.0 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord/two-hand lessons · ${loaded.source}`;
+    elements.releaseStatus.textContent=`v3.1 READY · ${engine.lessons.length} lessons · ${engine.lessons.filter(l=>l.notes.some(Array.isArray)).length} chord/two-hand lessons · ${loaded.source}`;
     elements.releaseStatus.classList.toggle('catalog-warning',!!loaded.warning);
     if(loaded.warning){elements.releaseStatus.textContent+=' · WARNING: '+loaded.warning;console.warn(loaded.warning);}
     syncRhythmLesson();

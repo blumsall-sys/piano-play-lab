@@ -1,5 +1,5 @@
-import {GameUI,restoreActive} from './game-ui.js?v=3.0';
-import {updateFingerGuides} from './finger-guides-v3.js';
+import {GameUI,restoreActive} from './game-ui.js?v=3.1';
+import {updateFingerGuides} from './finger-guides-v3.js?v=3.1';
 import {Keyboard} from './keyboard.js?v=2.9';
 import {profileFor,validateFirstC,MAUDIO,HAPE,midiMessage} from './keyboard-profiles.js?v=2.9';
 import {MicrophoneDetector,levelPercent,runPitchSelfTest} from './audio-input.js?v=2.9';
